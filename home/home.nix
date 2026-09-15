@@ -19,7 +19,7 @@
 
   programs.home-manager.enable = true;
 
-  imports = [ ./zsh.nix ];
+  imports = [ ./zsh.nix ./tmux.nix ./iterm2.nix ];
   # Future phases will add more here, e.g.:
   # imports = [ ./zsh.nix ./tmux.nix ./iterm2.nix ./nvim/nvim.nix ];
 }

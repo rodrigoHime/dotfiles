@@ -30,6 +30,7 @@
     brews = [ ];
     casks = [
       "iterm2"
+      "font-meslo-lg-nerd-font"
     ];
   };
 

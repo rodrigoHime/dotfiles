@@ -26,7 +26,7 @@
       gd = "git diff";
       vim = "nvim";
       vi = "nvim";
-      switch = "darwin-rebuild switch --flake ~/Projetos/dotfiles#rodrigos-macbook-pro";
+      switch = "darwin-rebuild switch --flake \"$HOME/Projetos/dotfiles#rodrigos-macbook-pro\"";
     };
 
     sessionVariables = {

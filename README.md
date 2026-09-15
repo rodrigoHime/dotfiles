@@ -18,6 +18,10 @@ docs/                    GUIDE.md and index.html status tracker
 bootstrap.sh             one-shot setup script for a brand-new Mac
 ```
 
+> **Note:** the flake reference (`...#rodrigos-macbook-pro`) is quoted in every
+> command above on purpose - zsh's extended globbing treats a bare `#` as a
+> glob operator and fails with "no matches found" otherwise.
+
 ## First-time setup (this machine)
 
 1. **Xcode Command Line Tools** (skip if already installed):
@@ -34,7 +38,7 @@ bootstrap.sh             one-shot setup script for a brand-new Mac
 3. **Activate this config**:
    ```
    cd ~/Projetos/dotfiles
-   sudo /nix/var/nix/profiles/default/bin/nix run nix-darwin -- switch --flake .#rodrigos-macbook-pro
+   sudo /nix/var/nix/profiles/default/bin/nix run nix-darwin -- switch --flake "$HOME/Projetos/dotfiles#rodrigos-macbook-pro"
    ```
    (The absolute path is because `sudo` doesn't inherit your shell's
    `PATH`, so plain `sudo nix ...` fails with "command not found" even
@@ -49,7 +53,7 @@ Or just run `./bootstrap.sh`, which does steps 1-3 for you.
 Edit a `.nix` file, then:
 
 ```
-darwin-rebuild switch --flake ~/Projetos/dotfiles#rodrigos-macbook-pro
+darwin-rebuild switch --flake "$HOME/Projetos/dotfiles#rodrigos-macbook-pro"
 ```
 
 Commit once you're happy with the result:
@@ -97,14 +101,14 @@ of the same modules — ask and we'll split it out when you get there.
 The loop, on whichever machine you're editing on:
 ```
 # edit a .nix file
-darwin-rebuild switch --flake ~/Projetos/dotfiles#rodrigos-macbook-pro
+darwin-rebuild switch --flake "$HOME/Projetos/dotfiles#rodrigos-macbook-pro"
 git add -A && git commit -m "..."
 git push
 ```
 On the other machine, before you start editing there:
 ```
 git pull
-darwin-rebuild switch --flake ~/Projetos/dotfiles#rodrigos-macbook-pro
+darwin-rebuild switch --flake "$HOME/Projetos/dotfiles#rodrigos-macbook-pro"
 ```
 That last `switch` matters even if you didn't edit anything locally —
 someone (past-you, on the other machine) may have changed the pinned

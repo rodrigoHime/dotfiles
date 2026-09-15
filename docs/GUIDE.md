@@ -13,12 +13,26 @@ everything is described in `.nix` files in this repo, and one command
 
 | I want to...                          | Command |
 |----------------------------------------|---------|
-| Apply changes after editing a `.nix` file | `darwin-rebuild switch --flake "$HOME/Projetos/dotfiles#rodrigos-macbook-pro"` |
-| See what would change, without applying | `darwin-rebuild build --flake "$HOME/Projetos/dotfiles#rodrigos-macbook-pro"` then diff `result` |
-| Update package versions (nixpkgs, home-manager, etc.) | `nix flake update` (inside the repo), then `darwin-rebuild switch ...` |
-| Share changes with another machine | `git add -A && git commit -m "..." && git push`, then on the other machine `git pull && darwin-rebuild switch --flake "$HOME/Projetos/dotfiles#rodrigos-macbook-pro"` |
-| Add a GUI app | Add its cask name to `darwin/configuration.nix` under `homebrew.casks`, then rebuild |
-| Add a CLI tool | Add its package name to `home/home.nix` under `home.packages`, then rebuild |
+| Apply changes after editing a `.nix` file | `switch` (a shell alias for `darwin-rebuild switch --flake "$HOME/Projetos/dotfiles#$DOTFILES_TARGET"` - `$DOTFILES_TARGET` is set correctly per-machine automatically) |
+| See what would change, without applying | `darwin-rebuild build --flake "$HOME/Projetos/dotfiles#$DOTFILES_TARGET"` then diff `result` |
+| Update package versions (nixpkgs, home-manager, etc.) | `nix flake update` (inside the repo), then `switch` |
+| Share changes with another machine | `git add -A && git commit -m "..." && git push`, then on the other machine `git pull && switch` |
+| Add a GUI app (personal machine) | Add its cask name to `darwin/personal-homebrew.nix` under `homebrew.casks`, then `switch` |
+| Add a GUI app (work machine) | Add its cask name to `darwin/work-homebrew.nix` under `homebrew.casks` - only adds, never removes anything else - then `switch` |
+| Add a CLI tool (both machines) | Add its package name to `home/home.nix` under `home.packages`, then `switch` |
+
+## Two machines, one repo
+
+This repo drives both your personal MacBook Pro and your work MacBook.
+Almost everything is shared (`home/home.nix` and everything it imports -
+zsh, tmux, iTerm2, Neovim once Phase 7 lands). The one deliberate
+difference is Homebrew: `darwin/personal-homebrew.nix` lets Nix fully own
+Homebrew on the personal machine; `darwin/work-homebrew.nix` treats the
+work machine's company-managed Homebrew as "IT's, hands off" - it can add
+declared casks/brews but is never allowed to remove anything (see
+comments in that file for why). Full reasoning in the project's
+`implementation-plan.md` and in `README.md`'s "Two machines, one repo"
+section.
 
 ## Why Claude Code isn't managed by Nix here
 

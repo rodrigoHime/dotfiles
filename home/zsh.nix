@@ -26,7 +26,9 @@
       gd = "git diff";
       vim = "nvim";
       vi = "nvim";
-      switch = "darwin-rebuild switch --flake \"$HOME/Projetos/dotfiles#rodrigos-macbook-pro\"";
+      # $DOTFILES_TARGET is set per-machine by flake.nix (mkHomeManager),
+      # so this one alias works correctly on either machine.
+      switch = "darwin-rebuild switch --flake \"$HOME/Projetos/dotfiles#$DOTFILES_TARGET\"";
     };
 
     sessionVariables = {

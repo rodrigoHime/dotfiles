@@ -50,10 +50,10 @@
   </div>
 
   <div class="phase">
-    <div class="badge done">✓</div>
-    <div><h2>3. Homebrew (via nix-homebrew)</h2>
-    <p>Bootstrapped by nix-homebrew; iTerm2 + Meslo Nerd Font installed via the first activation.</p></div>
-    <div class="status-label done">Activated</div>
+    <div class="badge pending">~</div>
+    <div><h2>3. Homebrew - split per machine</h2>
+    <p><strong>Personal:</strong> bootstrapped by nix-homebrew, Nix owns it; iTerm2 + Meslo Nerd Font installed via the first activation (<code>darwin/personal-homebrew.nix</code>). <strong>Work:</strong> company-managed build - Nix only adds declared casks/brews, never removes anything (<code>darwin/work-homebrew.nix</code>); not yet activated there, and <code>flake.nix</code> still needs the real work username filled in.</p></div>
+    <div class="status-label pending">Personal: activated · Work: pending</div>
   </div>
 
   <div class="phase">

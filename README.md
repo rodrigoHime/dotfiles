@@ -11,18 +11,48 @@ see [`docs/GUIDE.md`](docs/GUIDE.md). Status tracker: [`docs/index.html`](docs/i
 ## Repo layout
 
 ```
-flake.nix               entry point: darwin + home-manager config
-darwin/configuration.nix system settings, Homebrew casks/brews/taps
-home/home.nix            home-manager: packages, git, (soon: zsh/tmux/nvim)
-docs/                    GUIDE.md and index.html status tracker
-bootstrap.sh             one-shot setup script for a brand-new Mac
+flake.nix                    entry point: 2 darwinConfigurations (personal + work)
+darwin/common.nix             system settings shared by both machines
+darwin/personal-homebrew.nix  Homebrew - personal machine (Nix owns it, via nix-homebrew)
+darwin/work-homebrew.nix      Homebrew - work machine (company-managed, add-only)
+home/home.nix                 home-manager: packages, git, zsh/tmux/iterm2 imports
+docs/                         GUIDE.md and index.html status tracker
+bootstrap.sh                  one-shot setup script, takes a flake target argument
 ```
+
+## Two machines, one repo
+
+This repo drives **two different Macs** with one shared set of files, via
+two `darwinConfigurations` entries in `flake.nix`:
+
+| | `rodrigos-macbook-pro` (personal) | `rodrigos-work-macbook` (work) |
+|---|---|---|
+| Homebrew | Bootstrapped + fully owned by Nix (`nix-homebrew`) | Company-managed build - Nix only ever *adds* declared casks/brews, never removes anything (`onActivation.cleanup` is never set here) |
+| zsh / tmux / iTerm2 / Neovim | Identical, shared `home/home.nix` | Identical, shared `home/home.nix` |
+| Claude Code | Manual install, not Nix-managed (see docs/GUIDE.md) | Manual install, not Nix-managed - separate login/subscription from personal |
+
+Why Homebrew is handled so differently: the work Mac's Homebrew is a
+company build that only allows approved packages. Letting Nix "own" it
+the way it owns the personal machine's risks fighting whatever enforces
+that policy, and - worse - `cleanup` uninstalling something IT requires
+if it's ever turned on. So on that machine, Nix treats Homebrew as
+"IT's, hands off": it can guarantee a few extra tools are present, but
+never touches anything already there.
+
+**Before the first activation on the work Mac**, edit `flake.nix` and
+replace both `"CHANGE_ME"` placeholders with your actual macOS username
+there (run `whoami` on that machine to get it).
 
 > **Note:** the flake reference (`...#rodrigos-macbook-pro`) is quoted in every
 > command above on purpose - zsh's extended globbing treats a bare `#` as a
 > glob operator and fails with "no matches found" otherwise.
 
-## First-time setup (this machine)
+## First-time setup on a Mac
+
+Pick the flake target for that machine: `rodrigos-macbook-pro`
+(personal) or `rodrigos-work-macbook` (work - **edit `flake.nix` first**
+and replace the two `"CHANGE_ME"` placeholders with `whoami`'s output on
+that machine, or activation will fail).
 
 1. **Xcode Command Line Tools** (skip if already installed):
    ```
@@ -35,18 +65,21 @@ bootstrap.sh             one-shot setup script for a brand-new Mac
    ```
    Follow the prompts (it will ask for your password). Open a **new**
    terminal tab afterwards so `nix` is on your `PATH`.
-3. **Activate this config**:
+3. **Activate this config** (personal machine shown, swap the target
+   name for work):
    ```
    cd ~/Projetos/dotfiles
    sudo /nix/var/nix/profiles/default/bin/nix run nix-darwin -- switch --flake "$HOME/Projetos/dotfiles#rodrigos-macbook-pro"
    ```
    (The absolute path is because `sudo` doesn't inherit your shell's
    `PATH`, so plain `sudo nix ...` fails with "command not found" even
-   right after installing.) First run takes a while (downloads
-   Homebrew, iTerm2, etc.). After this, `darwin-rebuild` itself will be
-   on your `PATH`.
+   right after installing.) First run takes a while. After this,
+   `darwin-rebuild` itself will be on your `PATH`.
 
-Or just run `./bootstrap.sh`, which does steps 1-3 for you.
+Or just run `./bootstrap.sh <target>` (e.g. `./bootstrap.sh
+rodrigos-macbook-pro`), which does steps 1-3 for you. The target is a
+required argument on purpose - the two configs handle Homebrew very
+differently, so there's no safe default to fall back on.
 
 ## Making changes afterwards
 
@@ -85,35 +118,40 @@ history, but nothing syncs between machines until it has a remote.
 ```
 git clone git@github.com:<you>/dotfiles.git ~/Projetos/dotfiles
 cd ~/Projetos/dotfiles
-./bootstrap.sh
 ```
-`bootstrap.sh` installs Xcode CLT + Nix, then runs
-`darwin-rebuild switch --flake .#rodrigos-macbook-pro` — the same
-`darwinConfigurations` name is reused across machines on purpose (it's
-just a label in the flake, unrelated to the actual hostname), so the
-exact same flake works unmodified on a second Mac. If you later want
-per-machine differences (e.g. a laptop vs. a desktop config), that's a
-second `darwinConfigurations."<name>"` entry in `flake.nix` sharing most
-of the same modules — ask and we'll split it out when you get there.
+If this is the work Mac, edit `flake.nix` first and replace both
+`"CHANGE_ME"` placeholders with `whoami`'s output there. Then:
+```
+./bootstrap.sh rodrigos-macbook-pro     # personal
+./bootstrap.sh rodrigos-work-macbook    # work
+```
+`bootstrap.sh` installs Xcode CLT + Nix, then activates the target you
+gave it. The two `darwinConfigurations` names are just labels in the
+flake (unrelated to the actual hostname) - what differs between them is
+entirely in `darwin/personal-homebrew.nix` vs `darwin/work-homebrew.nix`
+(see "Two machines, one repo" above), everything else in this repo is
+identical on both.
 
 ## Keeping machines in sync
 
-The loop, on whichever machine you're editing on:
+Once activated once, the `switch` shell alias (from `home/zsh.nix`)
+picks the right target automatically on whichever machine you're on:
 ```
 # edit a .nix file
-darwin-rebuild switch --flake "$HOME/Projetos/dotfiles#rodrigos-macbook-pro"
+switch                       # same as: darwin-rebuild switch --flake "$HOME/Projetos/dotfiles#$DOTFILES_TARGET"
 git add -A && git commit -m "..."
 git push
 ```
 On the other machine, before you start editing there:
 ```
 git pull
-darwin-rebuild switch --flake "$HOME/Projetos/dotfiles#rodrigos-macbook-pro"
+switch
 ```
-That last `switch` matters even if you didn't edit anything locally —
-someone (past-you, on the other machine) may have changed the pinned
-package versions in `flake.lock`, and `switch` is what actually applies
-them.
+That `switch` matters even if you didn't edit anything locally — someone
+(past-you, on the other machine) may have changed the pinned package
+versions in `flake.lock`, and `switch` is what actually applies them.
+Package/dotfile changes always sync across machines this way; Homebrew
+state on the work Mac never does (by design — see above).
 
 **Don't commit secrets** (API keys, SSH private keys, tokens) into this
 repo even though it's private — if you need those managed declarativley

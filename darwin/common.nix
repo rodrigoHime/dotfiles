@@ -1,5 +1,7 @@
 { pkgs, username, ... }:
 
+# Shared by every machine, regardless of how Homebrew is handled there
+# (see darwin/personal-homebrew.nix vs darwin/work-homebrew.nix).
 {
   # Let `nix` commands (and flakes) work without extra CLI flags.
   nix.settings.experimental-features = "nix-command flakes";
@@ -12,26 +14,6 @@
 
   users.users.${username} = {
     home = "/Users/${username}";
-  };
-
-  # Homebrew is bootstrapped by nix-homebrew (see flake.nix); this block
-  # just declares what should be tapped/installed. GUI apps/casks live
-  # here; CLI tools generally go in home/home.nix via nixpkgs instead.
-  homebrew = {
-    enable = true;
-    onActivation = {
-      autoUpdate = true;
-      upgrade = true;
-      # cleanup = "uninstall"; # uncomment once you're confident the
-      #                        # declared list is complete - it removes
-      #                        # any brew/cask not listed below.
-    };
-    taps = [ ];
-    brews = [ ];
-    casks = [
-      "iterm2"
-      "font-meslo-lg-nerd-font"
-    ];
   };
 
   environment.variables.HOMEBREW_NO_ANALYTICS = "1";

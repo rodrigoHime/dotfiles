@@ -22,7 +22,7 @@ everything is described in `.nix` files in this repo, and one command
 
 ## Coming up (filled in as each phase ships)
 
-- [ ] Shell: zsh + oh-my-zsh + oh-my-posh
+- [x] Shell: zsh + oh-my-zsh + oh-my-posh (`home/zsh.nix`)
 - [ ] Terminal: iTerm2 profile + Tmux config
 - [ ] Claude Code install
 - [ ] Neovim (LazyVim base): file navigation, git diff review, LSP

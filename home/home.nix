@@ -6,8 +6,8 @@
   home.packages = with pkgs; [
     ripgrep
     fd
-    fzf
     bat
+    neovim  # placeholder; Phase 7 replaces this with the full LazyVim setup
   ];
 
   programs.git = {
@@ -19,6 +19,7 @@
 
   programs.home-manager.enable = true;
 
-  # Future phases will add imports here, e.g.:
+  imports = [ ./zsh.nix ];
+  # Future phases will add more here, e.g.:
   # imports = [ ./zsh.nix ./tmux.nix ./iterm2.nix ./nvim/nvim.nix ];
 }

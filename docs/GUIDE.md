@@ -16,6 +16,7 @@ everything is described in `.nix` files in this repo, and one command
 | Apply changes after editing a `.nix` file | `darwin-rebuild switch --flake ~/Projetos/dotfiles#rodrigos-macbook-pro` |
 | See what would change, without applying | `darwin-rebuild build --flake ~/Projetos/dotfiles#rodrigos-macbook-pro` then diff `result` |
 | Update package versions (nixpkgs, home-manager, etc.) | `nix flake update` (inside the repo), then `darwin-rebuild switch ...` |
+| Share changes with another machine | `git add -A && git commit -m "..." && git push`, then on the other machine `git pull && darwin-rebuild switch --flake ~/Projetos/dotfiles#rodrigos-macbook-pro` |
 | Add a GUI app | Add its cask name to `darwin/configuration.nix` under `homebrew.casks`, then rebuild |
 | Add a CLI tool | Add its package name to `home/home.nix` under `home.packages`, then rebuild |
 
@@ -27,3 +28,4 @@ everything is described in `.nix` files in this repo, and one command
 - [ ] Neovim (LazyVim base): file navigation, git diff review, LSP
 - [ ] Cheat-sheet of actual keybindings once they're configured
 - [ ] Troubleshooting section
+- [ ] Push to GitHub + verify a second-machine clone actually works

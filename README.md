@@ -55,6 +55,64 @@ Commit once you're happy with the result:
 git add -A && git commit -m "..."
 ```
 
+## Push this to GitHub (so machines can sync)
+
+Right now this repo is only local to this Mac — a `git commit` gives you
+history, but nothing syncs between machines until it has a remote.
+
+1. Create an empty repo on GitHub (no README/license — this repo already
+   has files), e.g. `rodrigohime/dotfiles`, **private** recommended since
+   it will contain machine-specific details.
+2. Point this repo at it and push:
+   ```
+   cd ~/Projetos/dotfiles
+   git remote add origin git@github.com:<you>/dotfiles.git   # or the https:// URL
+   git branch -M main
+   git push -u origin main
+   ```
+   (Uses whatever git auth is already set up in your Terminal — an SSH
+   key added to GitHub, or `gh auth login` if you use the GitHub CLI.)
+
+## New machine
+
+```
+git clone git@github.com:<you>/dotfiles.git ~/Projetos/dotfiles
+cd ~/Projetos/dotfiles
+./bootstrap.sh
+```
+`bootstrap.sh` installs Xcode CLT + Nix, then runs
+`darwin-rebuild switch --flake .#rodrigos-macbook-pro` — the same
+`darwinConfigurations` name is reused across machines on purpose (it's
+just a label in the flake, unrelated to the actual hostname), so the
+exact same flake works unmodified on a second Mac. If you later want
+per-machine differences (e.g. a laptop vs. a desktop config), that's a
+second `darwinConfigurations."<name>"` entry in `flake.nix` sharing most
+of the same modules — ask and we'll split it out when you get there.
+
+## Keeping machines in sync
+
+The loop, on whichever machine you're editing on:
+```
+# edit a .nix file
+darwin-rebuild switch --flake ~/Projetos/dotfiles#rodrigos-macbook-pro
+git add -A && git commit -m "..."
+git push
+```
+On the other machine, before you start editing there:
+```
+git pull
+darwin-rebuild switch --flake ~/Projetos/dotfiles#rodrigos-macbook-pro
+```
+That last `switch` matters even if you didn't edit anything locally —
+someone (past-you, on the other machine) may have changed the pinned
+package versions in `flake.lock`, and `switch` is what actually applies
+them.
+
+**Don't commit secrets** (API keys, SSH private keys, tokens) into this
+repo even though it's private — if you need those managed declarativley
+later, that's a separate tool (e.g. `agenix` or `sops-nix`), not plain
+Nix files. Ask if/when you want that set up.
+
 ## Status
 
 This repo is being built up in phases — see `docs/index.html` for what's

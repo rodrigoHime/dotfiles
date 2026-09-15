@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dev environment — status</title>
+<style>
+  :root {
+    --bg: #fafaf9; --panel: #ffffff; --text: #1c1917; --muted: #78716c;
+    --border: #e7e5e4; --accent: #2563eb; --done: #16a34a; --pending: #d97706; --todo: #a8a29e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#151312; --panel:#1f1c1b; --text:#f5f5f4; --muted:#a8a29e; --border:#332f2d; --accent:#60a5fa; --done:#4ade80; --pending:#fbbf24; --todo:#78716c; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 2rem 1rem 4rem; background: var(--bg); color: var(--text);
+         font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  main { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 1.5rem; margin: 0 0 .25rem; }
+  .sub { color: var(--muted); margin: 0 0 2rem; }
+  .phase { background: var(--panel); border: 1px solid var(--border); border-radius: 10px;
+           padding: 1rem 1.25rem; margin-bottom: .75rem; display: flex; gap: 1rem; align-items: flex-start; }
+  .badge { flex: none; width: 1.6rem; height: 1.6rem; border-radius: 50%; display: flex;
+           align-items: center; justify-content: center; font-size: .8rem; font-weight: 600;
+           color: #fff; margin-top: .1rem; }
+  .badge.done { background: var(--done); }
+  .badge.pending { background: var(--pending); }
+  .badge.todo { background: var(--todo); }
+  .phase h2 { font-size: .95rem; margin: 0 0 .2rem; }
+  .phase p { margin: 0; color: var(--muted); font-size: .88rem; }
+  .status-label { font-size: .72rem; text-transform: uppercase; letter-spacing: .04em;
+                  font-weight: 600; margin-left: auto; flex: none; padding-top: .2rem; }
+  .status-label.done { color: var(--done); }
+  .status-label.pending { color: var(--pending); }
+  .status-label.todo { color: var(--todo); }
+  footer { color: var(--muted); font-size: .8rem; margin-top: 2rem; }
+  code { background: var(--border); padding: .1em .35em; border-radius: 4px; font-size: .85em; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Dev environment — status</h1>
+  <p class="sub">Repo: <code>~/Projetos/dotfiles</code> · Last updated: 2026-09-15</p>
+
+  <div class="phase">
+    <div class="badge done">✓</div>
+    <div><h2>1–2. Bootstrap: Nix + nix-darwin + home-manager flake</h2>
+    <p>flake.nix, darwin/configuration.nix, home/home.nix scaffolded and committed. Not yet activated on this machine — run <code>./bootstrap.sh</code>.</p></div>
+    <div class="status-label done">Scaffolded</div>
+  </div>
+
+  <div class="phase">
+    <div class="badge pending">~</div>
+    <div><h2>3. Homebrew (via nix-homebrew)</h2>
+    <p>Module wired in; iTerm2 cask declared. Add more casks/brews as needed in <code>darwin/configuration.nix</code>.</p></div>
+    <div class="status-label pending">Declared, not activated</div>
+  </div>
+
+  <div class="phase">
+    <div class="badge todo">4</div>
+    <div><h2>Shell: zsh + oh-my-zsh + oh-my-posh</h2>
+    <p>Not started.</p></div>
+    <div class="status-label todo">To do</div>
+  </div>
+
+  <div class="phase">
+    <div class="badge todo">5</div>
+    <div><h2>Terminal: iTerm2 profile + Tmux</h2>
+    <p>Not started.</p></div>
+    <div class="status-label todo">To do</div>
+  </div>
+
+  <div class="phase">
+    <div class="badge todo">6</div>
+    <div><h2>Claude Code</h2>
+    <p>Not started.</p></div>
+    <div class="status-label todo">To do</div>
+  </div>
+
+  <div class="phase">
+    <div class="badge todo">7</div>
+    <div><h2>Neovim (LazyVim base) — full terminal IDE</h2>
+    <p>Not started. Will add Telescope/neo-tree, gitsigns/diffview, Mason LSP, toggleterm.</p></div>
+    <div class="status-label todo">To do</div>
+  </div>
+
+  <div class="phase">
+    <div class="badge todo">8</div>
+    <div><h2>Documentation</h2>
+    <p>README.md and docs/GUIDE.md started; this page is the tracker. Updated incrementally as phases land.</p></div>
+    <div class="status-label pending">In progress</div>
+  </div>
+
+  <div class="phase">
+    <div class="badge todo">9–10</div>
+    <div><h2>Portability check + workflow doc</h2>
+    <p>Not started — will simulate a second machine and finalize bootstrap.sh once phases 3–7 are done.</p></div>
+    <div class="status-label todo">To do</div>
+  </div>
+
+  <footer>Generated alongside the config in <code>~/Projetos/dotfiles</code>. Edit this file directly, or ask Claude to regenerate it as phases progress.</footer>
+</main>
+</body>
+</html>

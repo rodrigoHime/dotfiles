@@ -40,34 +40,34 @@
 <body>
 <main>
   <h1>Dev environment — status</h1>
-  <p class="sub">Repo: <code>~/Projetos/dotfiles</code> · Last updated: 2026-09-15</p>
+  <p class="sub">Repo: <code>~/Projetos/dotfiles</code> · Last updated: 2026-09-15 (first activation succeeded)</p>
 
   <div class="phase">
     <div class="badge done">✓</div>
     <div><h2>1–2. Bootstrap: Nix + nix-darwin + home-manager flake</h2>
-    <p>flake.nix, darwin/configuration.nix, home/home.nix scaffolded and committed. Not yet activated on this machine — run <code>./bootstrap.sh</code>.</p></div>
-    <div class="status-label done">Scaffolded</div>
+    <p>Nix installed, first <code>darwin-rebuild switch</code> completed successfully. <code>flake.lock</code> generated and committed.</p></div>
+    <div class="status-label done">Activated</div>
   </div>
 
   <div class="phase">
-    <div class="badge pending">~</div>
+    <div class="badge done">✓</div>
     <div><h2>3. Homebrew (via nix-homebrew)</h2>
-    <p>Module wired in; casks declared: iTerm2, Meslo Nerd Font. Add more in <code>darwin/configuration.nix</code>.</p></div>
-    <div class="status-label pending">Declared, not activated</div>
+    <p>Bootstrapped by nix-homebrew; iTerm2 + Meslo Nerd Font installed via the first activation.</p></div>
+    <div class="status-label done">Activated</div>
   </div>
 
   <div class="phase">
     <div class="badge done">4</div>
     <div><h2>Shell: zsh + oh-my-zsh + oh-my-posh</h2>
     <p><code>home/zsh.nix</code>: oh-my-zsh (git/macos/colored-man-pages plugins), oh-my-posh prompt (jandedobbeleer theme), fzf + zoxide integration, aliases, history sharing.</p></div>
-    <div class="status-label done">Scaffolded</div>
+    <div class="status-label done">Activated</div>
   </div>
 
   <div class="phase">
     <div class="badge done">5</div>
     <div><h2>Terminal: iTerm2 profile + Tmux</h2>
     <p><code>home/iterm2.nix</code>: dynamic profile with the Meslo Nerd Font. <code>home/tmux.nix</code>: C-a prefix, vi keys, resurrect/continuum (session persistence), vim-tmux-navigator (seamless pane/nvim-split movement).</p></div>
-    <div class="status-label done">Scaffolded</div>
+    <div class="status-label done">Activated</div>
   </div>
 
   <div class="phase">

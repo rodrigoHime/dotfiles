@@ -15,6 +15,14 @@ fi
 
 echo "==> 3/4 Activating nix-darwin (this will prompt for your password)"
 cd "$(dirname "$0")"
-sudo nix run nix-darwin -- switch --flake .#rodrigos-macbook-pro
+# `sudo` doesn't inherit the current shell's PATH, so `sudo nix ...` fails
+# with "command not found" even right after installing - use the
+# absolute path to the Nix that was just installed instead.
+NIX_BIN="/nix/var/nix/profiles/default/bin/nix"
+if ! command -v nix >/dev/null 2>&1 && [ ! -x "$NIX_BIN" ]; then
+  echo "Could not find nix. Open a NEW terminal tab and re-run this script." >&2
+  exit 1
+fi
+sudo "${NIX_BIN:-$(command -v nix)}" run nix-darwin -- switch --flake .#rodrigos-macbook-pro
 
 echo "==> 4/4 Done. Restart your terminal (or open iTerm2) to pick up the new shell."

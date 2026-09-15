@@ -34,10 +34,13 @@ bootstrap.sh             one-shot setup script for a brand-new Mac
 3. **Activate this config**:
    ```
    cd ~/Projetos/dotfiles
-   sudo nix run nix-darwin -- switch --flake .#rodrigos-macbook-pro
+   sudo /nix/var/nix/profiles/default/bin/nix run nix-darwin -- switch --flake .#rodrigos-macbook-pro
    ```
-   First run takes a while (downloads Homebrew, iTerm2, etc.). After
-   this, `darwin-rebuild` itself will be on your `PATH`.
+   (The absolute path is because `sudo` doesn't inherit your shell's
+   `PATH`, so plain `sudo nix ...` fails with "command not found" even
+   right after installing.) First run takes a while (downloads
+   Homebrew, iTerm2, etc.). After this, `darwin-rebuild` itself will be
+   on your `PATH`.
 
 Or just run `./bootstrap.sh`, which does steps 1-3 for you.
 

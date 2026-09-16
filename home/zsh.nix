@@ -28,7 +28,7 @@
       vi = "nvim";
       # $DOTFILES_TARGET is set per-machine by flake.nix (mkHomeManager),
       # so this one alias works correctly on either machine.
-      switch = "darwin-rebuild switch --flake \"$HOME/Projetos/dotfiles#$DOTFILES_TARGET\"";
+      switch = "sudo darwin-rebuild switch --flake \"$HOME/Projetos/dotfiles#$DOTFILES_TARGET\"";
     };
 
     sessionVariables = {

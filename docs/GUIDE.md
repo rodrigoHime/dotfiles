@@ -7,13 +7,13 @@ _Work in progress — filled in as each phase of the setup lands._
 A declarative, version-controlled macOS setup. Instead of clicking
 through System Settings and `brew install`-ing things one at a time,
 everything is described in `.nix` files in this repo, and one command
-(`darwin-rebuild switch`) makes your Mac match what's described.
+(`sudo darwin-rebuild switch`, or just `switch`) makes your Mac match what's described.
 
 ## Everyday commands
 
 | I want to...                          | Command |
 |----------------------------------------|---------|
-| Apply changes after editing a `.nix` file | `switch` (a shell alias for `darwin-rebuild switch --flake "$HOME/Projetos/dotfiles#$DOTFILES_TARGET"` - `$DOTFILES_TARGET` is set correctly per-machine automatically) |
+| Apply changes after editing a `.nix` file | `switch` (a shell alias for `sudo darwin-rebuild switch --flake "$HOME/Projetos/dotfiles#$DOTFILES_TARGET"` - `$DOTFILES_TARGET` is set correctly per-machine automatically; darwin-rebuild needs sudo to apply system-level changes) |
 | See what would change, without applying | `darwin-rebuild build --flake "$HOME/Projetos/dotfiles#$DOTFILES_TARGET"` then diff `result` |
 | Update package versions (nixpkgs, home-manager, etc.) | `nix flake update` (inside the repo), then `switch` |
 | Share changes with another machine | `git add -A && git commit -m "..." && git push`, then on the other machine `git pull && switch` |

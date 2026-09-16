@@ -87,7 +87,7 @@ differently, so there's no safe default to fall back on.
 Edit a `.nix` file, then:
 
 ```
-darwin-rebuild switch --flake "$HOME/Projetos/dotfiles#rodrigos-macbook-pro"
+sudo darwin-rebuild switch --flake "$HOME/Projetos/dotfiles#rodrigos-macbook-pro"
 ```
 
 Commit once you're happy with the result:
@@ -139,7 +139,7 @@ Once activated once, the `switch` shell alias (from `home/zsh.nix`)
 picks the right target automatically on whichever machine you're on:
 ```
 # edit a .nix file
-switch                       # same as: darwin-rebuild switch --flake "$HOME/Projetos/dotfiles#$DOTFILES_TARGET"
+switch                       # same as: sudo darwin-rebuild switch --flake "$HOME/Projetos/dotfiles#$DOTFILES_TARGET"
 git add -A && git commit -m "..."
 git push
 ```

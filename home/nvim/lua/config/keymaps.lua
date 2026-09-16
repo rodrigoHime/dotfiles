@@ -1,0 +1,6 @@
+-- Keymaps are automatically loaded on the VeryLazy event.
+-- Default keymaps that are always set:
+-- https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
+-- Add your own overrides here (also see lua/plugins/*.lua - most
+-- plugin-specific keymaps in this repo are defined next to the plugin
+-- spec that needs them instead, e.g. lua/plugins/git.lua).

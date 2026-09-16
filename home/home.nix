@@ -4,10 +4,9 @@
   home.stateVersion = "25.05";
 
   home.packages = with pkgs; [
-    ripgrep
-    fd
+    ripgrep # also used by Telescope's live grep
+    fd      # also used by Telescope's find files
     bat
-    neovim  # placeholder; Phase 7 replaces this with the full LazyVim setup
   ];
 
   programs.git = {
@@ -26,7 +25,5 @@
 
   programs.home-manager.enable = true;
 
-  imports = [ ./zsh.nix ./tmux.nix ./iterm2.nix ];
-  # Future phases will add more here, e.g.:
-  # imports = [ ./zsh.nix ./tmux.nix ./iterm2.nix ./nvim/nvim.nix ];
+  imports = [ ./zsh.nix ./tmux.nix ./iterm2.nix ./nvim/nvim.nix ];
 }

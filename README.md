@@ -15,7 +15,8 @@ flake.nix                    entry point: 2 darwinConfigurations (personal + wor
 darwin/common.nix             system settings shared by both machines
 darwin/personal-homebrew.nix  Homebrew - personal machine (Nix owns it, via nix-homebrew)
 darwin/work-homebrew.nix      Homebrew - work machine (company-managed, add-only)
-home/home.nix                 home-manager: packages, git, zsh/tmux/iterm2 imports
+home/home.nix                 home-manager: packages, git, zsh/tmux/iterm2/nvim imports
+home/nvim/                    LazyVim starter + our overrides (lua/plugins/*.lua), symlinked into ~/.config/nvim
 docs/                         GUIDE.md and index.html status tracker
 bootstrap.sh                  one-shot setup script, takes a flake target argument
 ```

@@ -25,6 +25,12 @@
         {
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
+          # Both machines already had their own dotfiles (~/.zshrc etc.)
+          # before this repo existed - same story as Homebrew. Rather
+          # than error out (the default) or silently delete what's
+          # there, move any conflicting existing file to "<name>.backup"
+          # once, then home-manager takes over that path going forward.
+          home-manager.backupFileExtension = "backup";
           home-manager.users.${username} = {
             imports = [ ./home/home.nix ];
             home.sessionVariables.DOTFILES_TARGET = target;

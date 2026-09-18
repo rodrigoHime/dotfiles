@@ -12,8 +12,8 @@
   programs.git = {
     enable = true;
     # TODO: confirm this is the name you want on commits.
-    userName = "Rodrigo Hime";
-    userEmail = "rodrigo.hime@gmail.com";
+    settings.user.name = "Rodrigo Hime";
+    settings.user.email = "rodrigo.hime@gmail.com";
     # TODO: this is shared across BOTH machines as written, so work
     # commits would show this personal email too. If you want a
     # different identity on the work machine, home-manager supports

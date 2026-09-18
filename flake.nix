@@ -54,6 +54,12 @@
               enableRosetta = false;
               user = "rodrigohime";
               mutableTaps = false;
+              # This machine already had Homebrew installed before any
+              # of this - nix-homebrew otherwise refuses to touch an
+              # existing install. autoMigrate adopts it (keeping
+              # already-installed packages) instead of demanding a
+              # from-scratch one.
+              autoMigrate = true;
             };
           }
         ] ++ mkHomeManager { username = "rodrigohime"; target = "rodrigos-macbook-pro"; };

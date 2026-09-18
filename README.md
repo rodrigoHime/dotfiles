@@ -64,14 +64,27 @@ that machine, or activation will fail).
    ```
    xcode-select --install
    ```
-2. **Install Nix** via the Determinate Systems installer (handles flakes
+2. **Homebrew** (skip if already installed and working - `brew --version`):
+   ```
+   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+   ```
+   This is required before the next step: nix-darwin's `homebrew` module
+   only ever *adds* the casks/brews declared in
+   `darwin/personal-homebrew.nix` / `darwin/work-homebrew.nix` to an
+   existing Homebrew - it doesn't install Homebrew itself, and
+   activation will abort with "requires homebrew installed" without it.
+   Running this same command against an existing, working install is a
+   safe no-op; running it against a broken one (missing `bin/brew` but
+   `Cellar`/`Taps` intact - this happened for real once) repairs it
+   without touching anything already installed.
+3. **Install Nix** via the Determinate Systems installer (handles flakes
    for you):
    ```
    curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
    ```
    Follow the prompts (it will ask for your password). Open a **new**
    terminal tab afterwards so `nix` is on your `PATH`.
-3. **Activate this config** (personal machine shown, swap the target
+4. **Activate this config** (personal machine shown, swap the target
    name for work):
    ```
    cd ~/Projetos/dotfiles
@@ -83,9 +96,11 @@ that machine, or activation will fail).
    `darwin-rebuild` itself will be on your `PATH`.
 
 Or just run `./bootstrap.sh <target>` (e.g. `./bootstrap.sh
-rodrigos-macbook-pro`), which does steps 1-3 for you. The target is a
-required argument on purpose - the two configs handle Homebrew very
-differently, so there's no safe default to fall back on.
+rodrigos-macbook-pro`), which checks for and does steps 1-4 for you (plus
+a pre-flight check that catches the work machine's `"CHANGE_ME"`
+placeholders before wasting time on the rest). The target is a required
+argument on purpose - the two configs handle Homebrew very differently,
+so there's no safe default to fall back on.
 
 ## Making changes afterwards
 
@@ -131,8 +146,10 @@ If this is the work Mac, edit `flake.nix` first and replace both
 ./bootstrap.sh rodrigos-macbook-pro     # personal
 ./bootstrap.sh rodrigos-work-macbook    # work
 ```
-`bootstrap.sh` installs Xcode CLT + Nix, then activates the target you
-gave it. The two `darwinConfigurations` names are just labels in the
+`bootstrap.sh` checks Homebrew is present and working (installing or
+repairing it if not), installs Xcode CLT + Nix, then activates the
+target you gave it. The two `darwinConfigurations` names are just labels
+in the
 flake (unrelated to the actual hostname) - what differs between them is
 entirely in `darwin/personal-homebrew.nix` vs `darwin/work-homebrew.nix`
 (see "Two machines, one repo" above), everything else in this repo is

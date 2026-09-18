@@ -1,9 +1,10 @@
 # dotfiles
 
 Reproducible macOS dev environment: **nix-darwin** for system config,
-**Homebrew** (via `nix-homebrew`) for GUI apps, **home-manager** for
-dotfiles (shell, tmux, Neovim...). Goal: clone this repo on any Mac and
-run one command to get the same environment back.
+**Homebrew** (hands-off, add-only on both machines - see "Two machines,
+one repo" below) for GUI apps, **home-manager** for dotfiles (shell,
+tmux, Neovim...). Goal: clone this repo on any Mac and run one command
+to get the same environment back.
 
 Full plan: see the project's `implementation-plan.md`. Day-to-day usage:
 see [`docs/GUIDE.md`](docs/GUIDE.md). Status tracker: [`docs/index.html`](docs/index.html).
@@ -13,7 +14,7 @@ see [`docs/GUIDE.md`](docs/GUIDE.md). Status tracker: [`docs/index.html`](docs/i
 ```
 flake.nix                    entry point: 2 darwinConfigurations (personal + work)
 darwin/common.nix             system settings shared by both machines
-darwin/personal-homebrew.nix  Homebrew - personal machine (Nix owns it, via nix-homebrew)
+darwin/personal-homebrew.nix  Homebrew - personal machine (hands-off, add-only)
 darwin/work-homebrew.nix      Homebrew - work machine (company-managed, add-only)
 home/home.nix                 home-manager: packages, git, zsh/tmux/iterm2/nvim imports
 home/nvim/                    LazyVim starter + our overrides (lua/plugins/*.lua), symlinked into ~/.config/nvim

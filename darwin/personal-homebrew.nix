@@ -19,7 +19,11 @@
       upgrade = false;
     };
     taps = [ ];
-    brews = [ ];
+    brews = [
+      # Backs the nvm setup ported into home/zsh.nix - was already
+      # installed here before this repo existed, just declaring it now.
+      "nvm"
+    ];
     casks = [
       "iterm2"
       "font-meslo-lg-nerd-font"

@@ -21,6 +21,53 @@ everything is described in `.nix` files in this repo, and one command
 | Add a GUI app (work machine) | Add its cask name to `darwin/work-homebrew.nix` under `homebrew.casks` - only adds, never removes anything else - then `switch` |
 | Add a CLI tool (both machines) | Add its package name to `home/home.nix` under `home.packages`, then `switch` |
 
+## One-time manual steps (Nix can't do these for you)
+
+A couple of things live at the macOS app-preferences level, outside
+anything a `.nix` file can reach - do these once, by hand, after the
+first `switch`:
+
+- **Set the "dotfiles" iTerm2 profile as default.** iTerm2 ->
+  Preferences -> Profiles -> select "dotfiles" -> "Other Actions..." ->
+  "Set as Default". Nix declares the profile (`home/iterm2.nix`) but
+  can't reach into iTerm2's own app-level default-profile setting.
+- **Option+Tab to accept a zsh autosuggestion.** iTerm2 -> Preferences
+  -> Profiles -> "dotfiles" -> Keys -> Key Mappings -> + -> press
+  Option+Tab for the shortcut -> Action: "Send Hex Code" -> value
+  `0x1b 0x09`. The zsh side of this (`bindkey '^[^I' autosuggest-accept`)
+  is already wired up in `home/zsh.nix`; only the iTerm2-side key
+  mapping needs this one manual click, since iTerm2's dynamic-profile
+  format for key mappings is obscure enough that it wasn't worth
+  guessing at from here.
+
+## Shell (zsh + oh-my-posh): ported from your old dotfiles
+
+The first real `switch` moved your pre-existing `~/.zshrc` and
+`~/.zprofile` aside to `~/.zshrc.backup` / `~/.zprofile.backup` (nothing
+was deleted). Everything worth keeping from them is now declared in
+`home/zsh.nix` instead:
+
+- Homebrew's `shellenv` (PATH/MANPATH for everything `brew` installs) -
+  nix-darwin's homebrew module doesn't set this up on its own.
+- `nvm` setup (also declared as a Homebrew formula in
+  `darwin/personal-homebrew.nix`, since it backs this).
+- PATH entries for `~/.local/bin`, yarn's global bin, and JetBrains
+  Toolbox's per-app launcher shims.
+- The `cc = "claude --dangerously-skip-permissions"` alias.
+- Your own oh-my-posh theme (`home/oh-my-posh/peru.omp.json`, copied in
+  from `~/.config/oh-my-posh/peru.omp.json`) instead of a stock theme.
+
+Left out on purpose (dead weight, not because Nix couldn't do it): the
+disabled Powerlevel10k instant-prompt block and `~/.p10k.zsh` source
+(superseded by oh-my-posh), the oh-my-zsh scaffolding comments (`programs.zsh.oh-my-zsh`
+handles that natively), and a note in the old `.zshrc` about a hardcoded
+`GITHUB_TOKEN` that had already been deliberately removed - nothing to
+port there, just history.
+
+The `.backup` files aren't managed by Nix and never will be - they're
+yours to read through and delete whenever you're confident nothing else
+in them is worth carrying over.
+
 ## Two machines, one repo
 
 This repo drives both your personal MacBook Pro and your work MacBook.

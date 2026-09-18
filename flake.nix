@@ -9,13 +9,9 @@
 
     home-manager.url = "github:nix-community/home-manager/master";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
-
-    # Only used by the personal machine - see darwin/personal-homebrew.nix
-    # vs darwin/work-homebrew.nix for why.
-    nix-homebrew.url = "github:zhaofengli/nix-homebrew";
   };
 
-  outputs = { self, nixpkgs, nix-darwin, home-manager, nix-homebrew, ... }:
+  outputs = { self, nixpkgs, nix-darwin, home-manager, ... }:
     let
       system = "aarch64-darwin";
 
@@ -37,8 +33,10 @@
       ];
     in
     {
-      # Personal MacBook Pro. Nix bootstraps + fully owns Homebrew here
-      # (darwin/personal-homebrew.nix + nix-homebrew below).
+      # Personal MacBook Pro. Homebrew here is hands-off, same model as
+      # the work machine - see darwin/personal-homebrew.nix for why
+      # (nix-homebrew's migration couldn't cleanly adopt the existing
+      # install, so we stopped fighting it).
       # Activate: darwin-rebuild switch --flake .#rodrigos-macbook-pro
       darwinConfigurations."rodrigos-macbook-pro" = nix-darwin.lib.darwinSystem {
         inherit system;
@@ -46,22 +44,6 @@
         modules = [
           ./darwin/common.nix
           ./darwin/personal-homebrew.nix
-
-          nix-homebrew.darwinModules.nix-homebrew
-          {
-            nix-homebrew = {
-              enable = true;
-              enableRosetta = false;
-              user = "rodrigohime";
-              mutableTaps = false;
-              # This machine already had Homebrew installed before any
-              # of this - nix-homebrew otherwise refuses to touch an
-              # existing install. autoMigrate adopts it (keeping
-              # already-installed packages) instead of demanding a
-              # from-scratch one.
-              autoMigrate = true;
-            };
-          }
         ] ++ mkHomeManager { username = "rodrigohime"; target = "rodrigos-macbook-pro"; };
       };
 

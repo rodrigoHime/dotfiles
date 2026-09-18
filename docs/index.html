@@ -40,7 +40,7 @@
 <body>
 <main>
   <h1>Dev environment — status</h1>
-  <p class="sub">Repo: <code>~/Projetos/dotfiles</code> · Last updated: 2026-09-16</p>
+  <p class="sub">Repo: <code>~/Projetos/dotfiles</code> · Last updated: 2026-09-18</p>
 
   <div class="phase">
     <div class="badge done">✓</div>
@@ -51,8 +51,8 @@
 
   <div class="phase">
     <div class="badge pending">~</div>
-    <div><h2>3. Homebrew - split per machine</h2>
-    <p><strong>Personal:</strong> bootstrapped by nix-homebrew, Nix owns it; iTerm2 + Meslo Nerd Font installed via the first activation (<code>darwin/personal-homebrew.nix</code>). <strong>Work:</strong> company-managed build - Nix only adds declared casks/brews, never removes anything (<code>darwin/work-homebrew.nix</code>); not yet activated there, and <code>flake.nix</code> still needs the real work username filled in.</p></div>
+    <div><h2>3. Homebrew - hands-off on both machines</h2>
+    <p><strong>Personal:</strong> existing Homebrew install left exactly as-is; Nix only adds the declared casks (iTerm2, Meslo Nerd Font) on top (<code>darwin/personal-homebrew.nix</code>) - switched from nix-homebrew ownership after its auto-migration couldn't cleanly adopt an existing <code>Library/Taps</code>. <strong>Work:</strong> same hands-off model, for the company-managed build - Nix only adds declared casks/brews, never removes anything (<code>darwin/work-homebrew.nix</code>); not yet activated there, and <code>flake.nix</code> still needs the real work username filled in.</p></div>
     <div class="status-label pending">Personal: activated · Work: pending</div>
   </div>
 

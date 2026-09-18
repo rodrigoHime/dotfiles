@@ -25,12 +25,19 @@ everything is described in `.nix` files in this repo, and one command
 
 This repo drives both your personal MacBook Pro and your work MacBook.
 Almost everything is shared (`home/home.nix` and everything it imports -
-zsh, tmux, iTerm2, Neovim once Phase 7 lands). The one deliberate
-difference is Homebrew: `darwin/personal-homebrew.nix` lets Nix fully own
-Homebrew on the personal machine; `darwin/work-homebrew.nix` treats the
-work machine's company-managed Homebrew as "IT's, hands off" - it can add
-declared casks/brews but is never allowed to remove anything (see
-comments in that file for why). Full reasoning in the project's
+zsh, tmux, iTerm2, Neovim). Homebrew is handled the *same, hands-off* way
+on both machines: `darwin/personal-homebrew.nix` and
+`darwin/work-homebrew.nix` each just add the casks/brews declared in
+that file to whatever Homebrew is already on the machine - Nix never
+takes ownership of Homebrew itself and is never allowed to remove
+anything (see comments in either file for why, and never set
+`onActivation.cleanup` to "uninstall"/"zap").
+
+(Personal used to be owned by `nix-homebrew` - dropped after its
+auto-migration couldn't cleanly adopt the pre-existing install, hitting
+an already-there `Library/Taps` it refused to touch. Rather than fight
+that, personal now works exactly like work: existing Homebrew stays
+exactly as it is, Nix only adds on top.) Full reasoning in the project's
 `implementation-plan.md` and in `README.md`'s "Two machines, one repo"
 section.
 

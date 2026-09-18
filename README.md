@@ -28,17 +28,21 @@ two `darwinConfigurations` entries in `flake.nix`:
 
 | | `rodrigos-macbook-pro` (personal) | `rodrigos-work-macbook` (work) |
 |---|---|---|
-| Homebrew | Bootstrapped + fully owned by Nix (`nix-homebrew`) | Company-managed build - Nix only ever *adds* declared casks/brews, never removes anything (`onActivation.cleanup` is never set here) |
+| Homebrew | Existing install, hands-off - Nix only ever *adds* declared casks/brews, never removes anything (`onActivation.cleanup` is never set) | Company-managed build - same hands-off model |
 | zsh / tmux / iTerm2 / Neovim | Identical, shared `home/home.nix` | Identical, shared `home/home.nix` |
 | Claude Code | Manual install, not Nix-managed (see docs/GUIDE.md) | Manual install, not Nix-managed - separate login/subscription from personal |
 
-Why Homebrew is handled so differently: the work Mac's Homebrew is a
-company build that only allows approved packages. Letting Nix "own" it
-the way it owns the personal machine's risks fighting whatever enforces
-that policy, and - worse - `cleanup` uninstalling something IT requires
-if it's ever turned on. So on that machine, Nix treats Homebrew as
-"IT's, hands off": it can guarantee a few extra tools are present, but
-never touches anything already there.
+Both machines handle Homebrew the same way now, for related but
+different reasons. The work Mac's Homebrew is a company build that only
+allows approved packages - letting Nix "own" it risks fighting whatever
+enforces that policy, and worse, `cleanup` could uninstall something IT
+requires. The personal Mac already had its own Homebrew install before
+this repo existed, and `nix-homebrew`'s auto-migration (which takes
+ownership of Homebrew) hit real friction trying to adopt it cleanly - so
+rather than keep fighting that, it gets the same "hands off" treatment:
+Nix can guarantee a couple of extra casks are present
+(`darwin/personal-homebrew.nix` / `darwin/work-homebrew.nix`), but never
+touches anything already installed on either machine.
 
 **Before the first activation on the work Mac**, edit `flake.nix` and
 replace both `"CHANGE_ME"` placeholders with your actual macOS username

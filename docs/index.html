@@ -40,7 +40,7 @@
 <body>
 <main>
   <h1>Dev environment — status</h1>
-  <p class="sub">Repo: <code>~/Projetos/dotfiles</code> · Last updated: 2026-09-18</p>
+  <p class="sub">Repo: <code>~/Projetos/dotfiles</code> · Last updated: 2026-09-29</p>
 
   <div class="phase">
     <div class="badge done">✓</div>
@@ -80,8 +80,8 @@
   <div class="phase">
     <div class="badge done">7</div>
     <div><h2>Neovim (LazyVim base) — full terminal IDE</h2>
-    <p><code>home/nvim/</code>: LazyVim starter, symlinked into <code>~/.config/nvim</code>. Telescope/neo-tree/gitsigns/trouble/Mason come from LazyVim's core by default; added diffview.nvim + lazygit.nvim (<code>&lt;leader&gt;gd/gh/gg</code>) and vim-tmux-navigator ourselves. Not yet launched for the first time - lazy.nvim clones everything on first <code>nvim</code> run (needs network).</p></div>
-    <div class="status-label pending">Scaffolded, not yet launched</div>
+    <p><code>home/nvim/</code>: LazyVim starter, symlinked into <code>~/.config/nvim</code>. Telescope/neo-tree/gitsigns/trouble/Mason come from LazyVim's core by default; added diffview.nvim + lazygit.nvim (<code>&lt;leader&gt;gd/gh/gg</code>) and vim-tmux-navigator ourselves. <strong>First real launch confirmed</strong> all 35 plugins installed and up to date; <code>home/nvim/lazy-lock.json</code> now pins their exact versions (via <code>mkOutOfStoreSymlink</code>, so <code>:Lazy update</code> writes straight into the tracked file).</p></div>
+    <div class="status-label done">Activated</div>
   </div>
 
   <div class="phase">

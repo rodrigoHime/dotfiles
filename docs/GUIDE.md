@@ -118,15 +118,21 @@ table in `home/nvim/lua/config/lazy.lua`, next to the LazyVim/plugins
 imports already there. Ask and we'll wire up whichever languages you
 want.
 
-**Making plugin versions reproducible too:** right now `flake.lock`
-pins Nix/nixpkgs/home-manager, but not the exact commit of each nvim
-plugin - that's a separate file, `lazy-lock.json`, which `lazy.nvim`
-writes to `~/.config/nvim/lazy-lock.json` after you've launched `nvim`
-at least once. It doesn't exist yet. Once it does: copy it into
-`home/nvim/lazy-lock.json`, add
-`xdg.configFile."nvim/lazy-lock.json".source = ./lazy-lock.json;` to
-`home/nvim/nvim.nix`, and commit both - from then on a second machine
-gets the exact same plugin versions too, not just the exact same specs.
+**Plugin versions are pinned too:** `flake.lock` pins Nix/nixpkgs/
+home-manager, and `home/nvim/lazy-lock.json` pins the exact commit of
+every one of the 35 nvim plugins (confirmed on first real launch -
+LazyVim's own core, blink.cmp, treesitter, mason, etc., all present and
+up to date). Unlike `init.lua`/`lua` (plain read-only symlinks into the
+Nix store), `lazy-lock.json` is wired up with `mkOutOfStoreSymlink`
+pointing straight at the repo file on disk - because `lazy.nvim`
+rewrites this file itself whenever you run `:Lazy update`, and a normal
+store symlink is read-only, which would make that update fail. With
+the out-of-store symlink, `:Lazy update` writes directly into the
+tracked file: `git diff` shows exactly which plugins moved, `git
+checkout home/nvim/lazy-lock.json` reverts it, `git add -A && git
+commit` locks in a deliberate upgrade - same workflow as any other file
+here. (This does assume the repo lives at `~/Projetos/dotfiles` - true
+on both machines per this project's own convention.)
 
 ## Why Claude Code isn't managed by Nix here
 

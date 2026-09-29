@@ -4,9 +4,12 @@
   home.stateVersion = "25.05";
 
   home.packages = with pkgs; [
-    ripgrep # also used by Telescope's live grep
-    fd      # also used by Telescope's find files
+    ripgrep # also used by nvim's Picker (live grep)
+    fd      # also used by nvim's Picker (find files)
     bat
+    gh      # GitHub CLI - octo.nvim (nvim's GitHub extra) shells out to
+            # this for auth + API calls; needs `gh auth login` once,
+            # see docs/GUIDE.md
   ];
 
   programs.git = {

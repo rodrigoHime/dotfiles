@@ -159,6 +159,40 @@ commit` locks in a deliberate upgrade - same workflow as any other file
 here. (This does assume the repo lives at `~/Projetos/dotfiles` - true
 on both machines per this project's own convention.)
 
+## Neovim as an IDE: navigation, debugging, testing, tasks, GitHub
+
+Added 2026-09-29 on top of everything above. File tree navigation and
+changed-files diff review were already covered (see the table below) -
+these extras round out the rest of what an IDE usually does.
+
+**Already there before this addition - no new plugins needed:**
+
+| Want | Keys | What it is |
+|---|---|---|
+| Browse the project as a tree | `<leader>e` (root dir) / `<leader>E` (cwd) | snacks.nvim Explorer - part of LazyVim's core, git-status glyphs on changed files |
+| See every changed file + its diff | `<leader>gd` | Diffview - a changed-files tree panel next to the diff, `plugins/git.lua` |
+| File history / repo history | `<leader>gh` / `<leader>gH` | Diffview |
+| Quick diff preview, no panel | `<leader>gs` | Snacks' own "Git Status" picker |
+| Full git client (stage/commit/branch/stash) | `<leader>gg` | LazyGit, floating window, `plugins/git.lua` |
+
+**New extras enabled in `home/nvim/lua/config/lazy.lua`:**
+
+| Feature | Keys | Notes |
+|---|---|---|
+| Symbols outline sidebar | `<leader>cs` | Functions/classes/methods in the current file, click to jump |
+| Breadcrumbs | *(shown in the winbar automatically)* | Module > class > function for the cursor position |
+| Quick file bookmarks | `<leader>1`-`<leader>9` jump, `<leader>h` menu, `<leader>H` add current file | Harpoon2 - pin the handful of files you're actually working on |
+| Reference highlighting | *(automatic)*, `]]`/`[[` or `<A-n>`/`<A-p>` to jump | Highlights other uses of the symbol under the cursor |
+| Rename across the project | `<leader>cr` | Live preview as you type |
+| Extract/inline refactors | via which-key under the LSP/refactor group | extract function/variable, inline variable |
+| Run & monitor tasks (build/test/lint) | `<leader>oo` run, `<leader>ow` task list, `<leader>ot` task action | Overseer - like VS Code's `tasks.json` |
+| Debugging | `<leader>db` breakpoint, `<leader>dc` continue, `<leader>di`/`<leader>dO`/`<leader>do` step into/over/out, `<leader>du` toggle the debugger UI, `<leader>dr` REPL | nvim-dap + nvim-dap-ui. Ruby (via `lang.ruby`'s nvim-dap-ruby) and JS/TS (via `lang.typescript`'s js-debug-adapter) both light up automatically now that this extra is on - not yet verified against a real breakpoint session, check your project has whatever the adapter needs (e.g. Ruby's `debug` gem) the first time you try it |
+| Run tests from inside nvim | `<leader>tr` nearest, `<leader>tt` file, `<leader>tT` all files, `<leader>ts` toggle summary, `<leader>to` show output, `<leader>td` debug nearest | neotest. Ruby gets `neotest-rspec` automatically from `lang.ruby`; JS/TS gets both `neotest-jest` and `neotest-vitest` from `plugins/testing.lua` (each only activates itself when it finds its own config file in the project) |
+| REST client | open a `.http` file, run a request from inside it | `util.rest` - a lightweight Postman replacement, response shown inline |
+| GitHub issues & PRs | `<leader>gi`/`<leader>gI` issues, `<leader>gp`/`<leader>gP` PRs, `<leader>gr` repos | Octo.nvim - needs the `gh` CLI (now in `home/home.nix`) authenticated once: run `gh auth login` in a terminal after the next `switch` |
+
+**One manual step this adds:** `gh auth login` (once, after the next `switch` pulls in the `gh` CLI) - Octo shells out to it for GitHub auth and API calls, and there's no way to script an interactive OAuth login from Nix.
+
 ## Why Claude Code isn't managed by Nix here
 
 It's installed manually on each machine instead of being declared in
@@ -181,5 +215,6 @@ log in with whichever account is right for that machine.
 - [x] Terminal: iTerm2 profile + Tmux config (`home/iterm2.nix`, `home/tmux.nix`)
 - [x] ~~Claude Code install~~ — intentionally left out of Nix management, see note below
 - [x] Neovim (LazyVim base): file navigation, git diff review, LSP (`home/nvim/`)
+- [x] Neovim IDE extras: outline, breadcrumbs, Harpoon2, illuminate, rename/refactor, Overseer tasks, debugging (DAP), testing (neotest), REST client, GitHub (Octo) - added, not yet verified by a real launch
 - [ ] Troubleshooting section
 - [ ] Push to GitHub + verify a second-machine clone actually works

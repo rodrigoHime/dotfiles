@@ -111,12 +111,37 @@ trouble, etc. - all included by LazyVim's core, nothing extra needed):
 | `<leader>gH` | Diffview: history of the whole repo |
 | `Ctrl+h/j/k/l` | Move between nvim splits *and* tmux panes seamlessly (vim-tmux-navigator) |
 
-**Adding a language:** LazyVim ships official "extras" per language
-(LSP + treesitter + formatting, pre-wired) - add a line like
-`{ import = "lazyvim.plugins.extras.lang.typescript" }` to the `spec`
-table in `home/nvim/lua/config/lazy.lua`, next to the LazyVim/plugins
-imports already there. Ask and we'll wire up whichever languages you
-want.
+**Web dev + Ruby/Rails LSP, enabled:** `home/nvim/lua/config/lazy.lua`
+now imports LazyVim's official extras for the stack you asked for:
+
+| Extra | Covers |
+|---|---|
+| `lang.typescript` | JavaScript, TypeScript, JSX/TSX - via `vtsls` |
+| `lang.tailwind` | Tailwind CSS class IntelliSense (harmless if a project doesn't use it) |
+| `lang.json` | `package.json`/`tsconfig.json`/etc. + schema validation |
+| `lang.ruby` | Ruby + Rails - `ruby_lsp` (default) + `rubocop` formatting + `erb-formatter` for Rails views |
+| `linting.eslint` | JS/TS linting |
+| `formatting.prettier` | Formats JS/TS/CSS/HTML/JSON/Markdown/YAML |
+
+Plain HTML and CSS don't have their own LazyVim extra (there's no
+`lang.html`/`lang.css`) - those two language servers (`html`, `cssls`)
+are instead declared directly in `home/nvim/lua/plugins/web.lua`,
+following LazyVim's own documented pattern for adding a server it
+doesn't already wire up. Every LSP/formatter/linter above installs
+itself automatically via Mason the first time you open a matching file
+- no extra setup needed beyond `switch` and launching `nvim` once.
+
+**One thing this doesn't cover:** these extras configure *Neovim's*
+side (the language servers, formatters, linters) - they don't install
+Ruby itself. Ruby/Rails development also needs an actual Ruby runtime
+on `PATH` (plus `bundler`/`rails`), which is a separate decision (Nix's
+own `ruby` package vs. a version manager like `rbenv`/`asdf` vs.
+Homebrew's `ruby` formula) - ask and we'll wire up whichever you'd
+prefer.
+
+**Adding another language later:** same pattern - add a line like
+`{ import = "lazyvim.plugins.extras.lang.<name>" }` to the `spec` table
+in `home/nvim/lua/config/lazy.lua`, next to the ones already there.
 
 **Plugin versions are pinned too:** `flake.lock` pins Nix/nixpkgs/
 home-manager, and `home/nvim/lazy-lock.json` pins the exact commit of

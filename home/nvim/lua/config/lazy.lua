@@ -28,6 +28,19 @@ require("lazy").setup({
     -- Telescope, neo-tree, gitsigns, trouble, mason+lspconfig,
     -- treesitter, etc. - all part of LazyVim's default core)
     { "LazyVim/LazyVim", import = "lazyvim.plugins" },
+
+    -- Web dev + Ruby/Rails language extras (LSP + formatting/linting,
+    -- pre-wired by LazyVim - see docs/GUIDE.md's "Neovim" section for
+    -- what each one sets up). Plain HTML/CSS language servers aren't
+    -- their own LazyVim extra (no "lang.html"/"lang.css" exists) -
+    -- that's handled instead by plugins/web.lua alongside these.
+    { import = "lazyvim.plugins.extras.lang.typescript" }, -- JS/TS/JSX/TSX (vtsls)
+    { import = "lazyvim.plugins.extras.lang.tailwind" }, -- Tailwind CSS class IntelliSense
+    { import = "lazyvim.plugins.extras.lang.json" }, -- package.json/tsconfig.json/etc. + schema validation
+    { import = "lazyvim.plugins.extras.lang.ruby" }, -- Ruby + Rails (ruby_lsp, rubocop, erb-formatter)
+    { import = "lazyvim.plugins.extras.linting.eslint" }, -- JS/TS linting
+    { import = "lazyvim.plugins.extras.formatting.prettier" }, -- JS/TS/CSS/HTML/JSON/MD/YAML formatting
+
     -- import/override with your own plugins (home/nvim/lua/plugins/*.lua)
     { import = "plugins" },
   },

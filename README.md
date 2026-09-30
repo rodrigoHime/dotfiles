@@ -7,7 +7,8 @@ tmux, Neovim...). Goal: clone this repo on any Mac and run one command
 to get the same environment back.
 
 Full plan: see the project's `implementation-plan.md`. Day-to-day usage:
-see [`docs/GUIDE.md`](docs/GUIDE.md). Status tracker: [`docs/index.html`](docs/index.html).
+see [`docs/GUIDE.md`](docs/GUIDE.md) or the browsable [`docs/guide.html`](docs/guide.html).
+Status tracker: [`docs/index.html`](docs/index.html).
 
 ## Repo layout
 

@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dotfiles Guide</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  /* Layout: same family as the "dotfiles" status page - sticky left rail +
+     content column - so the two read as one connected doc set. */
+  :root{
+    --bg:#f5f3ee; --surface:#ffffff; --surface-2:#efebe2; --border:#ded8c9;
+    --text:#221f1a; --text-muted:#6c665a; --text-faint:#8f8878;
+    --accent:#3457a6; --accent-2:#eef1fa; --accent-ink:#1f3670;
+    --key-bg:#eae5d8; --key-text:#3a3527;
+    --shadow: 0 1px 2px rgba(30,26,16,.06), 0 8px 24px -12px rgba(30,26,16,.12);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#15171c; --surface:#1b1e25; --surface-2:#20232b; --border:#2e323d;
+      --text:#e9e7df; --text-muted:#a3a096; --text-faint:#726f66;
+      --accent:#89a5e8; --accent-2:#202a42; --accent-ink:#c2d1f5;
+      --key-bg:#22262f; --key-text:#d7d3c6;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#15171c; --surface:#1b1e25; --surface-2:#20232b; --border:#2e323d;
+    --text:#e9e7df; --text-muted:#a3a096; --text-faint:#726f66;
+    --accent:#89a5e8; --accent-2:#202a42; --accent-ink:#c2d1f5;
+    --key-bg:#22262f; --key-text:#d7d3c6;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box;}
+  body{ background:var(--bg); color:var(--text); font-family:"IBM Plex Sans",system-ui,sans-serif; margin:0; }
+  h1,h2,h3{ font-family:"IBM Plex Sans",system-ui,sans-serif; text-wrap:balance; letter-spacing:-.01em; }
+  a{ color:var(--accent); }
+  p{ line-height:1.62; }
+
+  kbd{
+    font-family:"IBM Plex Mono","SF Mono",monospace; font-size:.82em; background:var(--key-bg); color:var(--key-text);
+    padding:.15em .45em; border-radius:5px; border:1px solid var(--border); white-space:nowrap;
+  }
+  code{ font-family:"IBM Plex Mono",monospace; background:var(--key-bg); color:var(--key-text); padding:.1em .35em; border-radius:4px; font-size:.86em; }
+
+  .masthead{ border-bottom:1px solid var(--border); background:var(--surface); padding:max(1.4rem, env(safe-area-inset-top,0px)) 1.25rem 1.4rem; }
+  .masthead-inner{ max-width:1180px; margin:0 auto; }
+  .masthead .eyebrow{ text-transform:uppercase; letter-spacing:.09em; font-size:.72rem; color:var(--accent); font-weight:600; margin:0 0 .5rem; }
+  .masthead h1{ font-size:1.7rem; margin:0 0 .3rem; font-weight:700; }
+  .masthead .sub{ margin:0; color:var(--text-muted); font-size:.95rem; max-width:60ch; }
+  .meta-row{ display:flex; flex-wrap:wrap; gap:.5rem 1.5rem; font-size:.82rem; color:var(--text-muted); margin-top:.9rem; }
+  .meta-row b{ color:var(--text); font-weight:600; font-family:"IBM Plex Mono",monospace; }
+
+  .shell{ max-width:1180px; margin:0 auto; display:grid; grid-template-columns:230px minmax(0,1fr); gap:2.5rem; padding:2rem 1.25rem 5rem; align-items:start; }
+  nav.rail{ position:sticky; top:max(1.25rem, env(safe-area-inset-top,0px)); align-self:start; }
+  nav.rail .rail-title{ font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; color:var(--text-faint); padding:0 .8rem .5rem; }
+  nav.rail ol{ list-style:none; margin:0 0 1.4rem; padding:0; display:flex; flex-direction:column; gap:.1rem; border-left:2px solid var(--border); }
+  nav.rail a{ display:block; padding:.3rem .8rem; font-size:.83rem; color:var(--text-muted); text-decoration:none; border-left:2px solid transparent; margin-left:-2px; }
+  nav.rail a:hover, nav.rail a:focus-visible{ color:var(--accent); border-left-color:var(--accent); outline:none; }
+
+  main{ min-width:0; display:flex; flex-direction:column; gap:3rem; }
+  section{ scroll-margin-top:1.5rem; min-width:0; }
+  section h2{ font-size:1.3rem; margin:0 0 .3rem; }
+  section .lede{ font-size:.85rem; color:var(--text-muted); margin:0 0 1.2rem; max-width:64ch; }
+  section h3{ font-size:1rem; margin:1.7rem 0 .6rem; }
+  section h3:first-of-type{ margin-top:1.2rem; }
+
+  .table-wrap{ overflow-x:auto; border:1px solid var(--border); border-radius:10px; }
+  table{ border-collapse:collapse; width:100%; font-size:.85rem; min-width:420px; }
+  th,td{ text-align:left; padding:.55rem .8rem; border-bottom:1px solid var(--border); vertical-align:top; }
+  thead th{ background:var(--surface-2); font-size:.71rem; text-transform:uppercase; letter-spacing:.05em; color:var(--text-muted); font-weight:600; }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr:hover{ background:var(--surface-2); }
+  td:first-child{ white-space:nowrap; }
+
+  .workflow{ display:flex; flex-direction:column; gap:.7rem; counter-reset:step; }
+  .workflow .step{ display:flex; gap:.9rem; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:.9rem 1.05rem; box-shadow:var(--shadow); }
+  .workflow .num{ counter-increment:step; flex:none; width:1.7rem; height:1.7rem; border-radius:50%; background:var(--accent-2); color:var(--accent-ink); font-size:.82rem; font-weight:700; display:flex; align-items:center; justify-content:center; font-family:"IBM Plex Mono",monospace; }
+  .workflow .num::before{ content: counter(step); }
+  .workflow strong{ color:var(--text); }
+  .workflow p{ margin:.15rem 0 0; font-size:.85rem; color:var(--text-muted); }
+
+  .card{ background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1.1rem 1.25rem; box-shadow:var(--shadow); }
+  .card + .card{ margin-top:.8rem; }
+  .card h4{ margin:0 0 .35rem; font-size:.95rem; }
+  .card .tag{ display:inline-block; font-size:.68rem; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:var(--accent-ink); background:var(--accent-2); padding:.18em .55em; border-radius:999px; margin-bottom:.5rem; }
+  .card p{ margin:.3rem 0; font-size:.87rem; color:var(--text-muted); }
+  .card p.try{ color:var(--text); }
+  .card p.try b{ font-weight:600; }
+
+  .cheat{ display:flex; flex-direction:column; gap:.5rem; }
+  .cheat details{ background:var(--surface); border:1px solid var(--border); border-radius:10px; box-shadow:var(--shadow); }
+  .cheat summary{ cursor:pointer; padding:.75rem 1rem; font-size:.87rem; font-weight:600; list-style:none; display:flex; align-items:center; gap:.6rem; }
+  .cheat summary::-webkit-details-marker{ display:none; }
+  .cheat summary::before{ content:"▸"; color:var(--accent); font-size:.72em; transition:transform .15s; }
+  .cheat details[open] summary::before{ transform:rotate(90deg); }
+  .cheat .cheat-body{ padding:0 1rem 1rem; }
+
+  .callout{ border:1px solid var(--border); border-left:3px solid var(--accent); background:var(--accent-2); border-radius:0 10px 10px 0; padding:.85rem 1rem; font-size:.85rem; color:var(--text); }
+  .callout strong{ color:var(--accent-ink); }
+  .callout.warn{ border-left-color:var(--text-faint); }
+
+  footer{ border-top:1px solid var(--border); padding:1.6rem 1.25rem calc(1.6rem + env(safe-area-inset-bottom,0px)); text-align:center; color:var(--text-faint); font-size:.78rem; }
+
+  @media (max-width:860px){
+    .shell{ grid-template-columns:1fr; }
+    nav.rail{ position:static; }
+    nav.rail ol{ flex-direction:row; overflow-x:auto; border-left:none; border-bottom:1px solid var(--border); padding-bottom:.6rem; gap:.3rem; }
+    nav.rail a{ border-left:none; border-bottom:2px solid transparent; margin-left:0; white-space:nowrap; }
+    nav.rail a:hover, nav.rail a:focus-visible{ border-left-color:transparent; border-bottom-color:var(--accent); }
+    nav.rail .rail-title{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <p class="eyebrow">User guide</p>
+    <h1>Dotfiles Guide</h1>
+    <p class="sub">How to actually use the environment day to day — the terminal, the shell, and Neovim as a full IDE, plugin by plugin.</p>
+    <div class="meta-row">
+      <span>Repo <b>~/Projetos/dotfiles</b></span>
+      <span>Companion to <a href="index.html">the status tracker</a> (also <a href="https://claude.ai/artifact/F2nktN4H4DXVh2CE7V6exe">hosted here</a>)</span>
+      <span>Covers Phases 1–11</span>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="rail" aria-label="Sections">
+    <p class="rail-title">On this page</p>
+    <ol>
+      <li><a href="#workflow">A normal day</a></li>
+      <li><a href="#terminal">Terminal</a></li>
+      <li><a href="#shell">Shell</a></li>
+      <li><a href="#nvim-basics">Neovim basics</a></li>
+      <li><a href="#navigate">Navigate & find</a></li>
+      <li><a href="#git">Git & code review</a></li>
+      <li><a href="#write">Write & refactor</a></li>
+      <li><a href="#debug-test">Debug & test</a></li>
+      <li><a href="#tasks-rest">Tasks & REST</a></li>
+      <li><a href="#change-config">Changing the config</a></li>
+      <li><a href="#manual-steps">Manual steps</a></li>
+      <li><a href="#cheatsheet">Keymap cheat sheet</a></li>
+      <li><a href="#troubleshooting">Troubleshooting</a></li>
+    </ol>
+  </nav>
+
+  <main>
+
+    <section id="workflow">
+      <h2>A normal day</h2>
+      <p class="lede">The shape of a session, start to finish — everything below is covered in its own section further down.</p>
+      <div class="workflow">
+        <div class="step"><span class="num"></span><div><strong>Open iTerm2.</strong><p>Launches into the "dotfiles" profile (Meslo Nerd Font, the "peru" oh-my-posh prompt).</p></div></div>
+        <div class="step"><span class="num"></span><div><strong>Attach or start a tmux session.</strong><p><code>tmux</code> for a new one, <code>tmux a</code> to reattach — continuum auto-saves and restores your panes, so a reboot doesn't lose your layout.</p></div></div>
+        <div class="step"><span class="num"></span><div><strong>Split panes for the tools you're running.</strong><p>One for <code>nvim</code>, one for a dev server or test watcher, one for <code>cc</code> (Claude Code) — <kbd>Ctrl</kbd><kbd>h/j/k/l</kbd> moves between them, and between nvim splits, without thinking about which one you're in.</p></div></div>
+        <div class="step"><span class="num"></span><div><strong>Open the project in nvim.</strong><p><code>nvim .</code> from the project root. Use the Explorer or the file picker to get around, LSP for navigation and diagnostics, Diffview/LazyGit for review.</p></div></div>
+        <div class="step"><span class="num"></span><div><strong>Edit → check the diff → commit.</strong><p><kbd>&lt;leader&gt;gd</kbd> to see everything you've changed before you stage it, <kbd>&lt;leader&gt;gg</kbd> to commit from LazyGit without leaving nvim.</p></div></div>
+      </div>
+    </section>
+
+    <section id="terminal">
+      <h2>Terminal: iTerm2 + tmux</h2>
+      <p class="lede">iTerm2 is the window; tmux is what actually manages sessions, windows and panes inside it — and what survives a reboot.</p>
+
+      <h3>tmux essentials</h3>
+      <p style="font-size:.85rem;color:var(--text-muted);">Prefix is <kbd>Ctrl</kbd><kbd>a</kbd> (not the tmux default <kbd>Ctrl</kbd><kbd>b</kbd>) — press it, release, then the key below.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Keys</th><th>Does</th></tr></thead>
+          <tbody>
+            <tr><td><kbd>prefix</kbd> <kbd>|</kbd></td><td>Split pane vertically, opens in the current pane's directory</td></tr>
+            <tr><td><kbd>prefix</kbd> <kbd>-</kbd></td><td>Split pane horizontally, same directory</td></tr>
+            <tr><td><kbd>prefix</kbd> <kbd>c</kbd></td><td>New window, same directory</td></tr>
+            <tr><td><kbd>Ctrl</kbd> <kbd>h/j/k/l</kbd></td><td>Move between panes — and seamlessly into/out of nvim splits, no prefix needed</td></tr>
+            <tr><td><kbd>prefix</kbd> <kbd>H/J/K/L</kbd></td><td>Resize the current pane (repeatable — hold)</td></tr>
+            <tr><td><kbd>prefix</kbd> <kbd>r</kbd></td><td>Reload tmux config without restarting</td></tr>
+            <tr><td>mouse</td><td>Click to select a pane, drag borders to resize, scroll to scroll back — mouse mode is on</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout"><strong>Your layout survives a reboot.</strong> <code>resurrect</code> + <code>continuum</code> auto-save your session every 15 minutes and restore it the next time tmux starts — <code>tmux a</code> after restarting your Mac should put you back where you left off, panes included.</div>
+
+      <h3>iTerm2</h3>
+      <p style="font-size:.85rem;color:var(--text-muted);">The "dotfiles" profile is declared in <code>home/iterm2.nix</code> — Meslo Nerd Font (needed for the prompt's glyphs and nvim's icons), unlimited-feeling scrollback, no bell noise. Two things live at the macOS app-preferences level and need a one-time click each — see <a href="#manual-steps">Manual steps</a> below.</p>
+    </section>
+
+    <section id="shell">
+      <h2>Shell: zsh + oh-my-posh</h2>
+      <p class="lede">oh-my-zsh supplies the framework (git/macos/colored-man-pages/command-not-found plugins, autosuggestions, syntax highlighting); oh-my-posh owns the prompt itself, rendering your "peru" theme.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Keys / command</th><th>Does</th></tr></thead>
+          <tbody>
+            <tr><td><kbd>→</kbd> or <kbd>Option</kbd><kbd>Tab</kbd></td><td>Accept the greyed-out autosuggestion from your history</td></tr>
+            <tr><td><kbd>Ctrl</kbd> <kbd>r</kbd></td><td>fzf: fuzzy-search command history</td></tr>
+            <tr><td><kbd>Ctrl</kbd> <kbd>t</kbd></td><td>fzf: fuzzy-find files, insert the path at the cursor</td></tr>
+            <tr><td><code>z &lt;partial name&gt;</code></td><td>zoxide: jump to a frecently-used directory without a full path</td></tr>
+            <tr><td><code>switch</code></td><td>Rebuild and apply the Nix config for whichever machine you're on</td></tr>
+            <tr><td><code>gs</code> / <code>gd</code> / <code>g</code></td><td><code>git status</code> / <code>git diff</code> / <code>git</code>, shell-level (independent of nvim's own git tools)</td></tr>
+            <tr><td><code>cc</code></td><td><code>claude --dangerously-skip-permissions</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="nvim-basics">
+      <h2>Neovim basics</h2>
+      <p class="lede">Everything from here down is nvim (LazyVim base). One habit makes the rest of this page mostly unnecessary to memorize:</p>
+      <div class="callout"><strong>Press <kbd>Space</kbd> and wait.</strong> That's the leader key — every keymap below starts with it. Pausing after it pops up <b>which-key</b>: every available next key, grouped and labelled, live. You genuinely don't need to memorize most of this page — you need to know it exists, then let which-key remind you. <kbd>&lt;leader&gt;?</kbd> shows the full list for the current buffer at once.</div>
+      <h3>Reading code</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Keys</th><th>Does</th></tr></thead>
+          <tbody>
+            <tr><td><kbd>K</kbd></td><td>Hover documentation for the symbol under the cursor</td></tr>
+            <tr><td><kbd>gd</kbd></td><td>Go to definition</td></tr>
+            <tr><td><kbd>gr</kbd></td><td>List references</td></tr>
+            <tr><td><kbd>gI</kbd></td><td>Go to implementation</td></tr>
+            <tr><td><kbd>gy</kbd></td><td>Go to type definition</td></tr>
+            <tr><td><kbd>gK</kbd> / <kbd>Ctrl</kbd><kbd>k</kbd> (insert)</td><td>Signature help — argument hints while typing a call</td></tr>
+            <tr><td><kbd>&lt;leader&gt;ca</kbd></td><td>Code actions (quick fixes, imports, etc.) for the cursor position</td></tr>
+            <tr><td><kbd>&lt;leader&gt;cd</kbd></td><td>Show the full diagnostic for the current line</td></tr>
+            <tr><td><kbd>]d</kbd> / <kbd>[d</kbd></td><td>Next / previous diagnostic</td></tr>
+            <tr><td><kbd>&lt;leader&gt;xx</kbd></td><td>Open Trouble — a full diagnostics panel for the project</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Moving around buffers</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Keys</th><th>Does</th></tr></thead>
+          <tbody>
+            <tr><td><kbd>Shift</kbd><kbd>h</kbd> / <kbd>Shift</kbd><kbd>l</kbd></td><td>Previous / next buffer (shown on the bufferline tab strip)</td></tr>
+            <tr><td><kbd>&lt;leader&gt;bd</kbd></td><td>Close the current buffer</td></tr>
+            <tr><td><kbd>&lt;leader&gt;wd</kbd></td><td>Close the current split</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="navigate">
+      <h2>Navigate & find</h2>
+      <p class="lede">Three complementary ways to get to a file or a symbol — Explorer when you want to see the tree, Picker when you know roughly what you're looking for, Harpoon for the handful of files you're living in right now.</p>
+
+      <div class="card">
+        <span class="tag">File tree</span>
+        <h4>Explorer</h4>
+        <p>A persistent sidebar tree of the project, git-status glyphs on every changed file. <code>snacks.nvim</code>, part of LazyVim's core.</p>
+        <p class="try"><b>Try it:</b> <kbd>&lt;leader&gt;e</kbd> opens it rooted at the project; <kbd>&lt;leader&gt;E</kbd> roots it at your current directory instead. Inside: <kbd>Enter</kbd> opens, <kbd>a</kbd> creates, <kbd>d</kbd> deletes, <kbd>r</kbd> renames.</p>
+      </div>
+      <div class="card">
+        <span class="tag">Fuzzy finder</span>
+        <h4>Picker</h4>
+        <p>Type a few letters of a filename or a grep term, jump straight there. Also <code>snacks.nvim</code>.</p>
+        <p class="try"><b>Try it:</b> <kbd>&lt;leader&gt;&lt;space&gt;</kbd> find files, <kbd>&lt;leader&gt;/</kbd> live grep across the project, <kbd>&lt;leader&gt;,</kbd> switch buffers, <kbd>&lt;leader&gt;fr</kbd> recently opened files.</p>
+      </div>
+      <div class="card">
+        <span class="tag">Quick bookmarks</span>
+        <h4>Harpoon2</h4>
+        <p>For the 3–5 files you're actually editing right now — faster than re-searching for the same file for the tenth time today.</p>
+        <p class="try"><b>Try it:</b> <kbd>&lt;leader&gt;H</kbd> to pin the current file, <kbd>&lt;leader&gt;h</kbd> to see/manage your pinned list, then <kbd>&lt;leader&gt;1</kbd>-<kbd>&lt;leader&gt;9</kbd> to jump straight to any of them from anywhere.</p>
+      </div>
+      <div class="card">
+        <span class="tag">Structure</span>
+        <h4>Outline &amp; breadcrumbs</h4>
+        <p>A sidebar listing every function/class/method in the current file, plus a winbar showing exactly where the cursor sits in that structure.</p>
+        <p class="try"><b>Try it:</b> <kbd>&lt;leader&gt;cs</kbd> toggles the outline sidebar, click any entry to jump. The breadcrumb (module &gt; class &gt; function) just shows up above the buffer automatically — nothing to press.</p>
+      </div>
+    </section>
+
+    <section id="git">
+      <h2>Git & code review</h2>
+      <p class="lede">Four tools, each for a different moment — a quick glance at a hunk, reviewing everything you've changed, staging/committing, or working with GitHub itself.</p>
+
+      <div class="card">
+        <span class="tag">Inline</span>
+        <h4>gitsigns</h4>
+        <p>A <code>+</code>/<code>~</code>/<code>-</code> column in the gutter next to every changed line, always on, no toggle needed.</p>
+        <p class="try"><b>Try it:</b> <kbd>&lt;leader&gt;gb</kbd> blames the current line; hover a changed line for a hunk preview.</p>
+      </div>
+      <div class="card">
+        <span class="tag">Review everything</span>
+        <h4>Diffview</h4>
+        <p>The main event for "what did I actually change" — a changed-files tree on one side, the diff for whichever one you've selected on the other. Exactly VS Code's Source Control diff view.</p>
+        <p class="try"><b>Try it:</b> <kbd>&lt;leader&gt;gd</kbd> opens it. <kbd>&lt;leader&gt;gh</kbd> shows the history of just the current file, <kbd>&lt;leader&gt;gH</kbd> the whole repo's history. <kbd>&lt;leader&gt;gs</kbd> is the lighter-weight version — a quick changed-files list with a diff preview, no separate panel.</p>
+      </div>
+      <div class="card">
+        <span class="tag">Full client</span>
+        <h4>LazyGit</h4>
+        <p>The entire TUI git client in a floating window — stage hunks, commit, branch, stash, rebase, push — without leaving nvim or opening a new pane.</p>
+        <p class="try"><b>Try it:</b> <kbd>&lt;leader&gt;gg</kbd>. <kbd>q</kbd> closes it. Space stages/unstages under the cursor, <kbd>c</kbd> commits.</p>
+      </div>
+      <div class="card">
+        <span class="tag">GitHub</span>
+        <h4>Octo</h4>
+        <p>Browse and act on GitHub issues and PRs as regular nvim buffers — comment, review, change labels, all as text.</p>
+        <p class="try"><b>Try it:</b> <kbd>&lt;leader&gt;gi</kbd> your open issues, <kbd>&lt;leader&gt;gI</kbd> search all issues, <kbd>&lt;leader&gt;gp</kbd>/<kbd>&lt;leader&gt;gP</kbd> the PR equivalents, <kbd>&lt;leader&gt;gr</kbd> list repos. Needs <code>gh auth login</code> once first — see <a href="#manual-steps">Manual steps</a>.</p>
+      </div>
+    </section>
+
+    <section id="write">
+      <h2>Write & refactor</h2>
+      <p class="lede">Formatting and linting already run automatically (Mason installs the right tool per language the first time you open a matching file) — these are the tools for actively reshaping code.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Keys</th><th>What</th></tr></thead>
+          <tbody>
+            <tr><td><kbd>&lt;leader&gt;cr</kbd></td><td>Rename the symbol under the cursor everywhere, with a live preview as you type</td></tr>
+            <tr><td><kbd>&lt;leader&gt;rx</kbd></td><td>Extract the selected code into a new variable</td></tr>
+            <tr><td><kbd>&lt;leader&gt;rf</kbd></td><td>Extract the selection into a new function</td></tr>
+            <tr><td><kbd>&lt;leader&gt;ri</kbd></td><td>Inline a variable at the cursor back into its uses</td></tr>
+            <tr><td><kbd>&lt;leader&gt;rs</kbd></td><td>Open the full refactor menu (select interactively instead of remembering a key)</td></tr>
+            <tr><td><i>automatic</i></td><td>Every other use of the symbol under the cursor highlights itself — <kbd>]]</kbd>/<kbd>[[</kbd> jumps between them</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="debug-test">
+      <h2>Debug & test</h2>
+      <p class="lede">Both are opt-in per project: debugging needs a debug adapter that matches the language (Ruby and JS/TS already have theirs wired up), testing needs neotest to recognize your test framework's config file.</p>
+
+      <div class="card">
+        <span class="tag">Breakpoints</span>
+        <h4>Debugging (nvim-dap)</h4>
+        <p>Ruby gets a debug adapter automatically (needs the <code>debug</code> gem in that project's <code>Gemfile</code>); JS/TS gets one too (<code>js-debug-adapter</code>, installs itself via Mason the first time you debug).</p>
+        <p class="try"><b>A typical session:</b> <kbd>&lt;leader&gt;db</kbd> on the line you want to stop at, <kbd>&lt;leader&gt;dc</kbd> to run until you hit it, then <kbd>&lt;leader&gt;di</kbd>/<kbd>&lt;leader&gt;dO</kbd>/<kbd>&lt;leader&gt;do</kbd> to step into/over/out, <kbd>&lt;leader&gt;du</kbd> to see the full debugger UI (variables, call stack, watches), <kbd>&lt;leader&gt;dt</kbd> to stop.</p>
+      </div>
+      <div class="card">
+        <span class="tag">Test runner</span>
+        <h4>Testing (neotest)</h4>
+        <p>Ruby uses RSpec automatically. JS/TS supports both Jest and Vitest — whichever config file your project has is the one that activates.</p>
+        <p class="try"><b>Try it:</b> <kbd>&lt;leader&gt;tr</kbd> runs the nearest test to the cursor, <kbd>&lt;leader&gt;tt</kbd> the whole file, <kbd>&lt;leader&gt;tT</kbd> every test file in the project. <kbd>&lt;leader&gt;ts</kbd> toggles a summary panel (pass/fail per test), <kbd>&lt;leader&gt;to</kbd> shows a failure's output, <kbd>&lt;leader&gt;td</kbd> runs the nearest test under the debugger instead.</p>
+      </div>
+    </section>
+
+    <section id="tasks-rest">
+      <h2>Tasks & REST</h2>
+      <div class="card">
+        <span class="tag">Task runner</span>
+        <h4>Overseer</h4>
+        <p>Run and watch build/test/lint/dev-server commands from inside nvim instead of a separate terminal pane — closer to VS Code's <code>tasks.json</code> than a raw shell.</p>
+        <p class="try"><b>Try it:</b> <kbd>&lt;leader&gt;oo</kbd> run a task, <kbd>&lt;leader&gt;ow</kbd> see the task list/output, <kbd>&lt;leader&gt;ot</kbd> act on a running task (restart, stop, open its terminal).</p>
+      </div>
+      <div class="card">
+        <span class="tag">HTTP client</span>
+        <h4>REST client (kulala.nvim)</h4>
+        <p>Write a request as plain text in a <code>.http</code> file, run it, see the response inline — a lightweight Postman for quick API checks.</p>
+        <p class="try"><b>Try it:</b> open or create a <code>.http</code> file, put the cursor inside a request block, <kbd>&lt;leader&gt;Rs</kbd> to send it. <kbd>&lt;leader&gt;Rr</kbd> replays the last request.</p>
+      </div>
+    </section>
+
+    <section id="change-config">
+      <h2>Changing the config</h2>
+      <p class="lede">Nvim's config lives in <code>home/nvim/lua/</code> in the repo — editing it there <em>is</em> editing your live config, no deploy step.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>I want to…</th><th>Do this</th></tr></thead>
+          <tbody>
+            <tr><td>Enable another LazyVim language/feature extra</td><td>Add <code>{ import = "lazyvim.plugins.extras.&lt;path&gt;" }</code> to <code>home/nvim/lua/config/lazy.lua</code>'s <code>spec</code> table, then <code>switch</code> + relaunch nvim</td></tr>
+            <tr><td>Add a plugin LazyVim doesn't ship as an extra</td><td>New file under <code>home/nvim/lua/plugins/</code> returning a plugin spec table (see <code>plugins/git.lua</code> or <code>plugins/testing.lua</code> for the pattern)</td></tr>
+            <tr><td>Change a keymap</td><td><code>home/nvim/lua/config/keymaps.lua</code> for a global one, or next to the plugin spec that owns it</td></tr>
+            <tr><td>Apply the change</td><td><code>switch</code>, then quit and relaunch nvim so lazy.nvim picks up the new spec</td></tr>
+            <tr><td>Lock in new plugin versions after that</td><td><code>lazy-lock.json</code> updates itself on launch (it's an out-of-store symlink into the repo) — just <code>git add -A &amp;&amp; git commit</code> once you're happy</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="manual-steps">
+      <h2>Manual steps</h2>
+      <p class="lede">A handful of things sit outside anything a <code>.nix</code> file can reach — one-time clicks or commands, not part of the regular workflow.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Step</th><th>Why it's manual</th></tr></thead>
+          <tbody>
+            <tr><td>iTerm2 → Preferences → Profiles → select "dotfiles" → Other Actions… → Set as Default</td><td>Nix declares the profile, not iTerm2's own app-level default</td></tr>
+            <tr><td>iTerm2 → Preferences → Profiles → "dotfiles" → Keys → + → <kbd>Option</kbd><kbd>Tab</kbd> → Send Hex Code → <code>0x1b 0x09</code></td><td>Pairs with the zsh-side <code>bindkey</code> already in <code>home/zsh.nix</code>; iTerm2's key-mapping format is too obscure to safely generate</td></tr>
+            <tr><td><code>gh auth login</code>, once, in any terminal</td><td>Octo (GitHub in nvim) shells out to the <code>gh</code> CLI for auth — no way to script an interactive OAuth flow from Nix</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="cheatsheet">
+      <h2>Keymap cheat sheet</h2>
+      <p class="lede">Everything above, grouped by leader prefix, for quick lookup. When in doubt, <kbd>Space</kbd> and wait for which-key beats memorizing this.</p>
+      <div class="cheat">
+
+        <details>
+          <summary>Files &amp; search — <kbd>&lt;leader&gt;e/f/,/space//</kbd></summary>
+          <div class="cheat-body">
+            <div class="table-wrap"><table><tbody>
+              <tr><td><kbd>&lt;leader&gt;e</kbd> / <kbd>E</kbd></td><td>Explorer (root / cwd)</td></tr>
+              <tr><td><kbd>&lt;leader&gt;&lt;space&gt;</kbd></td><td>Find files</td></tr>
+              <tr><td><kbd>&lt;leader&gt;/</kbd></td><td>Grep project</td></tr>
+              <tr><td><kbd>&lt;leader&gt;,</kbd></td><td>Switch buffers</td></tr>
+              <tr><td><kbd>&lt;leader&gt;fr</kbd></td><td>Recent files</td></tr>
+              <tr><td><kbd>&lt;leader&gt;h</kbd> / <kbd>H</kbd> / <kbd>1</kbd>-<kbd>9</kbd></td><td>Harpoon menu / pin file / jump to pinned file</td></tr>
+              <tr><td><kbd>&lt;leader&gt;cs</kbd></td><td>Symbols outline</td></tr>
+            </tbody></table></div>
+          </div>
+        </details>
+
+        <details>
+          <summary>Code — <kbd>g*</kbd>, <kbd>&lt;leader&gt;c*</kbd>, <kbd>&lt;leader&gt;r*</kbd>, <kbd>&lt;leader&gt;x*</kbd></summary>
+          <div class="cheat-body">
+            <div class="table-wrap"><table><tbody>
+              <tr><td><kbd>K</kbd> / <kbd>gd</kbd> / <kbd>gr</kbd> / <kbd>gI</kbd> / <kbd>gy</kbd></td><td>Hover / definition / references / implementation / type definition</td></tr>
+              <tr><td><kbd>&lt;leader&gt;ca</kbd></td><td>Code action</td></tr>
+              <tr><td><kbd>&lt;leader&gt;cr</kbd></td><td>Rename (live preview)</td></tr>
+              <tr><td><kbd>&lt;leader&gt;cd</kbd> / <kbd>]d</kbd> / <kbd>[d</kbd></td><td>Line diagnostic / next / prev</td></tr>
+              <tr><td><kbd>&lt;leader&gt;xx</kbd></td><td>Trouble diagnostics panel</td></tr>
+              <tr><td><kbd>&lt;leader&gt;rx</kbd> / <kbd>rf</kbd> / <kbd>ri</kbd> / <kbd>rs</kbd></td><td>Extract variable / extract function / inline variable / refactor menu</td></tr>
+            </tbody></table></div>
+          </div>
+        </details>
+
+        <details>
+          <summary>Git &amp; GitHub — <kbd>&lt;leader&gt;g*</kbd></summary>
+          <div class="cheat-body">
+            <div class="table-wrap"><table><tbody>
+              <tr><td><kbd>&lt;leader&gt;gd</kbd> / <kbd>gh</kbd> / <kbd>gH</kbd></td><td>Diffview open / file history / repo history</td></tr>
+              <tr><td><kbd>&lt;leader&gt;gs</kbd></td><td>Quick git status + diff preview</td></tr>
+              <tr><td><kbd>&lt;leader&gt;gg</kbd></td><td>LazyGit (floating)</td></tr>
+              <tr><td><kbd>&lt;leader&gt;gb</kbd></td><td>Blame current line</td></tr>
+              <tr><td><kbd>&lt;leader&gt;gi</kbd> / <kbd>gI</kbd></td><td>Octo: your open issues / search all</td></tr>
+              <tr><td><kbd>&lt;leader&gt;gp</kbd> / <kbd>gP</kbd></td><td>Octo: open PRs / search all</td></tr>
+              <tr><td><kbd>&lt;leader&gt;gr</kbd></td><td>Octo: list repos</td></tr>
+            </tbody></table></div>
+          </div>
+        </details>
+
+        <details>
+          <summary>Debug &amp; test — <kbd>&lt;leader&gt;d*</kbd>, <kbd>&lt;leader&gt;t*</kbd></summary>
+          <div class="cheat-body">
+            <div class="table-wrap"><table><tbody>
+              <tr><td><kbd>&lt;leader&gt;db</kbd> / <kbd>dB</kbd></td><td>Toggle breakpoint / conditional breakpoint</td></tr>
+              <tr><td><kbd>&lt;leader&gt;dc</kbd> / <kbd>dC</kbd></td><td>Continue / run to cursor</td></tr>
+              <tr><td><kbd>&lt;leader&gt;di</kbd> / <kbd>dO</kbd> / <kbd>do</kbd></td><td>Step into / over / out</td></tr>
+              <tr><td><kbd>&lt;leader&gt;du</kbd> / <kbd>dr</kbd> / <kbd>dt</kbd></td><td>Toggle debugger UI / REPL / terminate</td></tr>
+              <tr><td><kbd>&lt;leader&gt;tr</kbd> / <kbd>tt</kbd> / <kbd>tT</kbd></td><td>Run nearest test / file / all files</td></tr>
+              <tr><td><kbd>&lt;leader&gt;ts</kbd> / <kbd>to</kbd> / <kbd>td</kbd></td><td>Toggle summary / show output / debug nearest</td></tr>
+            </tbody></table></div>
+          </div>
+        </details>
+
+        <details>
+          <summary>Tasks, REST &amp; buffers — <kbd>&lt;leader&gt;o*</kbd>, <kbd>R*</kbd>, <kbd>b*</kbd></summary>
+          <div class="cheat-body">
+            <div class="table-wrap"><table><tbody>
+              <tr><td><kbd>&lt;leader&gt;oo</kbd> / <kbd>ow</kbd> / <kbd>ot</kbd></td><td>Overseer: run task / task list / task action</td></tr>
+              <tr><td><kbd>&lt;leader&gt;Rs</kbd> / <kbd>Rr</kbd></td><td>REST: send request / replay last</td></tr>
+              <tr><td><kbd>Shift</kbd><kbd>h</kbd> / <kbd>Shift</kbd><kbd>l</kbd></td><td>Previous / next buffer</td></tr>
+              <tr><td><kbd>&lt;leader&gt;bd</kbd> / <kbd>wd</kbd></td><td>Close buffer / close split</td></tr>
+            </tbody></table></div>
+          </div>
+        </details>
+
+        <details>
+          <summary>tmux — <kbd>prefix</kbd> = <kbd>Ctrl</kbd><kbd>a</kbd></summary>
+          <div class="cheat-body">
+            <div class="table-wrap"><table><tbody>
+              <tr><td><kbd>prefix</kbd> <kbd>|</kbd> / <kbd>-</kbd> / <kbd>c</kbd></td><td>Split vertical / horizontal / new window</td></tr>
+              <tr><td><kbd>Ctrl</kbd> <kbd>h/j/k/l</kbd></td><td>Move between panes (and nvim splits)</td></tr>
+              <tr><td><kbd>prefix</kbd> <kbd>H/J/K/L</kbd></td><td>Resize pane</td></tr>
+              <tr><td><kbd>prefix</kbd> <kbd>r</kbd></td><td>Reload config</td></tr>
+            </tbody></table></div>
+          </div>
+        </details>
+
+      </div>
+    </section>
+
+    <section id="troubleshooting">
+      <h2>Troubleshooting</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Symptom</th><th>Check</th></tr></thead>
+          <tbody>
+            <tr><td>A language server isn't attaching</td><td><code>:LspInfo</code> in the buffer, then <code>:Mason</code> to confirm the server actually installed</td></tr>
+            <tr><td>A plugin seems missing or out of date</td><td><code>:Lazy</code> — shows install/update status for every plugin, <code>:Lazy update</code> updates and rewrites <code>lazy-lock.json</code></td></tr>
+            <tr><td>Something feels generally broken</td><td><code>:checkhealth</code> — nvim's own built-in diagnostic, flags missing tools/config issues</td></tr>
+            <tr><td>Icons/glyphs render as boxes</td><td>Confirm iTerm2's profile font is actually "MesloLGSNerdFontMono" (Font Book → exact family name) — see <code>home/iterm2.nix</code></td></tr>
+            <tr><td>Debugging or testing can't find a runtime</td><td>Open a terminal split (<kbd>Ctrl</kbd><kbd>/</kbd>) and confirm <code>ruby</code>/<code>node</code>/<code>gem</code> resolve on <code>PATH</code> — if not, that's a <code>home/zsh.nix</code> PATH entry to add, same pattern as <code>nvm</code>'s</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>Companion to <a href="index.html">the dotfiles status tracker</a> (also <a href="https://claude.ai/artifact/F2nktN4H4DXVh2CE7V6exe">hosted here</a>) — generated alongside <code>~/Projetos/dotfiles</code>, ask Claude to regenerate this page as the config changes.</footer>
+</body>
+</html>

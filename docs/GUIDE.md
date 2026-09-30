@@ -2,6 +2,8 @@
 
 _Work in progress — filled in as each phase of the setup lands._
 
+> Prefer a browsable version? Open [`docs/guide.html`](guide.html) in a browser for the same content with navigation, a cheat-sheet, and dark mode.
+
 ## What this is
 
 A declarative, version-controlled macOS setup. Instead of clicking

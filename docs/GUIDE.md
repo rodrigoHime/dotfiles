@@ -171,7 +171,7 @@ these extras round out the rest of what an IDE usually does.
 
 | Want | Keys | What it is |
 |---|---|---|
-| Browse the project as a tree | `<leader>e` (root dir) / `<leader>E` (cwd) | snacks.nvim Explorer - part of LazyVim's core, git-status glyphs on changed files |
+| Browse the project as a tree | `<leader>e` (root dir) / `<leader>E` (cwd) - also opens automatically when you run `nvim <a-directory>` (e.g. `nvim .`), alongside the dashboard | snacks.nvim Explorer - part of LazyVim's core, git-status glyphs on changed files |
 | See every changed file + its diff | `<leader>gd` | Diffview - a changed-files tree panel next to the diff, `plugins/git.lua` |
 | File history / repo history | `<leader>gh` / `<leader>gH` | Diffview |
 | Quick diff preview, no panel | `<leader>gs` | Snacks' own "Git Status" picker |

@@ -58,10 +58,13 @@
       # never removes anything IT installed. See that file for the
       # reasoning.
       #
-      # TODO before the first activation on that machine: replace
-      # "CHANGE_ME" below with the real macOS username (run `whoami`
-      # there) - can't be filled in from here, this session isn't
-      # linked to that Mac.
+      # "CHANGE_ME" below is a placeholder. `bootstrap.sh` asks for the
+      # real macOS username (defaulting to `whoami`) and fills in both
+      # occurrences automatically on first run against this target - see
+      # the pre-flight check in bootstrap.sh. Running `darwin-rebuild
+      # switch` directly instead, without ever having run bootstrap.sh
+      # here, needs both "CHANGE_ME" occurrences below replaced by hand
+      # first.
       # Activate: darwin-rebuild switch --flake .#rodrigos-work-macbook
       darwinConfigurations."rodrigos-work-macbook" = nix-darwin.lib.darwinSystem {
         inherit system;

@@ -34,16 +34,27 @@ if [ "$(uname -m)" != "arm64" ]; then
   echo "that in flake.nix before activation will work. Continuing anyway..." >&2
 fi
 
-# The work machine's darwinConfigurations entry still has literal
-# "CHANGE_ME" username placeholders until someone fills them in on that
-# actual machine (can't be done from anywhere else) - this is a real
-# gotcha that's already bitten us once, worth failing fast on instead of
-# letting nix-darwin fail deep into evaluation with a confusing error.
+# The work machine's darwinConfigurations entry ships with literal
+# "CHANGE_ME" username placeholders - Nix needs the real username baked
+# into flake.nix at eval time (it can't just read $USER at build time),
+# and nobody but this script can know the answer until it's actually
+# running on that Mac. Used to make you hand-edit flake.nix and re-run;
+# now it just asks, defaulting to `whoami`, and fills both occurrences
+# in for you.
 if [ "$TARGET" = "rodrigos-work-macbook" ] && grep -q '"CHANGE_ME"' flake.nix; then
-  echo "flake.nix still has 'CHANGE_ME' placeholders for the work machine's" >&2
-  echo "username. Run 'whoami' on this Mac and replace both occurrences in" >&2
-  echo "flake.nix, then re-run this script." >&2
-  exit 1
+  DETECTED_USER="$(whoami)"
+  echo "flake.nix still has 'CHANGE_ME' placeholders for the work machine's username."
+  read -r -p "macOS username to use here [${DETECTED_USER}]: " WORK_USERNAME
+  WORK_USERNAME="${WORK_USERNAME:-$DETECTED_USER}"
+  if [ -z "$WORK_USERNAME" ]; then
+    echo "No username given - can't continue." >&2
+    exit 1
+  fi
+  # macOS's sed requires the (otherwise GNU-only) empty '' after -i.
+  sed -i '' "s/\"CHANGE_ME\"/\"${WORK_USERNAME}\"/g" flake.nix
+  echo "flake.nix updated: username = \"${WORK_USERNAME}\" (both occurrences)."
+  echo "This script won't commit that change for you - review it (git diff" >&2
+  echo "flake.nix) and commit once activation below succeeds." >&2
 fi
 
 echo "==> 2/6 Xcode Command Line Tools"

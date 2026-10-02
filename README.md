@@ -46,9 +46,12 @@ Nix can guarantee a couple of extra casks are present
 (`darwin/personal-homebrew.nix` / `darwin/work-homebrew.nix`), but never
 touches anything already installed on either machine.
 
-**Before the first activation on the work Mac**, edit `flake.nix` and
-replace both `"CHANGE_ME"` placeholders with your actual macOS username
-there (run `whoami` on that machine to get it).
+**Before the first activation on the work Mac**, `flake.nix` has two
+`"CHANGE_ME"` placeholders for your actual macOS username there -
+`./bootstrap.sh rodrigos-work-macbook` now asks for it (defaulting to
+`whoami`) and fills both in for you; only edit `flake.nix` by hand if
+you're running `darwin-rebuild switch` directly instead of through
+bootstrap.sh.
 
 > **Note:** the flake reference (`...#rodrigos-macbook-pro`) is quoted in every
 > command above on purpose - zsh's extended globbing treats a bare `#` as a
@@ -57,9 +60,11 @@ there (run `whoami` on that machine to get it).
 ## First-time setup on a Mac
 
 Pick the flake target for that machine: `rodrigos-macbook-pro`
-(personal) or `rodrigos-work-macbook` (work - **edit `flake.nix` first**
-and replace the two `"CHANGE_ME"` placeholders with `whoami`'s output on
-that machine, or activation will fail).
+(personal) or `rodrigos-work-macbook` (work - `flake.nix` has two
+`"CHANGE_ME"` placeholders for your macOS username there, but
+`./bootstrap.sh` below asks for it and fills them in itself; only
+edit `flake.nix` by hand first if you're activating with
+`darwin-rebuild switch` directly, skipping bootstrap.sh).
 
 1. **Xcode Command Line Tools** (skip if already installed):
    ```
@@ -97,11 +102,12 @@ that machine, or activation will fail).
    `darwin-rebuild` itself will be on your `PATH`.
 
 Or just run `./bootstrap.sh <target>` (e.g. `./bootstrap.sh
-rodrigos-macbook-pro`), which checks for and does steps 1-4 for you (plus
-a pre-flight check that catches the work machine's `"CHANGE_ME"`
-placeholders before wasting time on the rest). The target is a required
-argument on purpose - the two configs handle Homebrew very differently,
-so there's no safe default to fall back on.
+rodrigos-macbook-pro`), which checks for and does steps 1-4 for you - on
+the work machine, that includes asking for your macOS username
+(defaulting to `whoami`) and filling in `flake.nix`'s `"CHANGE_ME"`
+placeholders itself, instead of making you edit the file first. The
+target is a required argument on purpose - the two configs handle
+Homebrew very differently, so there's no safe default to fall back on.
 
 ## Making changes afterwards
 
@@ -141,8 +147,10 @@ history, but nothing syncs between machines until it has a remote.
 git clone git@github.com:<you>/dotfiles.git ~/Projetos/dotfiles
 cd ~/Projetos/dotfiles
 ```
-If this is the work Mac, edit `flake.nix` first and replace both
-`"CHANGE_ME"` placeholders with `whoami`'s output there. Then:
+If this is the work Mac, you don't need to edit anything first -
+`./bootstrap.sh rodrigos-work-macbook` below will ask for your macOS
+username (defaulting to `whoami`) and fill in `flake.nix`'s two
+`"CHANGE_ME"` placeholders itself. Then:
 ```
 ./bootstrap.sh rodrigos-macbook-pro     # personal
 ./bootstrap.sh rodrigos-work-macbook    # work

@@ -22,6 +22,8 @@ everything is described in `.nix` files in this repo, and one command
 | Add a GUI app (personal machine) | Add its cask name to `darwin/personal-homebrew.nix` under `homebrew.casks`, then `switch` |
 | Add a GUI app (work machine) | Add its cask name to `darwin/work-homebrew.nix` under `homebrew.casks` - only adds, never removes anything else - then `switch` |
 | Add a CLI tool (both machines) | Add its package name to `home/home.nix` under `home.packages`, then `switch` |
+| Pick up a changed tmux setting | `switch`, then **restart the tmux server** (`tmux kill-server` from outside tmux, open a fresh session). tmux reads its config once, when the server starts; `prefix` `r` only re-sources the file |
+| Rebuild can't find a file I just created | `git add` it first. A flake only sees files git knows about, even untracked-but-present ones are invisible to it |
 
 ## One-time manual steps (Nix can't do these for you)
 
@@ -102,8 +104,8 @@ network access and happens once, not something Nix does for you.
 LazyVim's which-key pops up and shows every available keybinding grouped
 by category. That's the reliable way to find things, since LazyVim's
 own defaults can shift slightly between versions. A few we added
-ourselves, on top of LazyVim's defaults (Telescope, neo-tree, gitsigns,
-trouble, etc. - all included by LazyVim's core, nothing extra needed):
+ourselves, on top of LazyVim's defaults (snacks.nvim's Explorer and Picker,
+gitsigns, trouble, etc. - all included by LazyVim's core, nothing extra needed):
 
 | Keys | Does |
 |------|------|
@@ -195,6 +197,102 @@ these extras round out the rest of what an IDE usually does.
 
 **One manual step this adds:** `gh auth login` (once, after the next `switch` pulls in the `gh` CLI) - Octo shells out to it for GitHub auth and API calls, and there's no way to script an interactive OAuth login from Nix.
 
+## Day-to-day how-tos
+
+Things that come up constantly once you're actually working in nvim and tmux.
+
+**Revert changes in a file (nvim).** Press `<leader>gh` and wait: which-key
+shows the gitsigns "hunks" menu. `R` is **Reset Buffer** (throw away every
+unstaged change in the file), `r` is **Reset Hunk** (just the chunk under
+the cursor). Related keys in the same menu: `s`/`S` stage a hunk/the whole
+buffer, `u` undoes a stage, `p` previews a hunk inline, `b`/`B` blame the
+line/buffer, `d` opens "Diff This" (against the index) and `D` the "Diff This ~" variant (against an earlier revision, per gitsigns).
+Reset restores the *index* version, so anything you already staged stays.
+For a true "back to the last commit, ignore staging" revert, open LazyGit
+(`<leader>gg`), select the file and discard its changes there.
+
+**Close a diff view (nvim).** "Diff This" (`<leader>ghd`) is a plain split
+pair, not the Diffview tab. Close either half (`:q` / `<C-w>q`) and the
+other one leaves diff mode on its own; or press `<C-w>o` in the window you
+want to keep to close everything else. The Diffview panel (`<leader>gd`)
+closes with `:DiffviewClose`.
+
+**`<leader>gh` is two things.** This repo binds `<leader>gh` to Diffview's
+"current file history", and LazyVim core uses the same `<leader>gh` prefix
+for the hunks menu (`<leader>ghs`, `<leader>ghr`...). In practice which-key
+shows the hunks menu. If Diffview's file history ever seems unreachable,
+this is why; `<leader>gH` (repo history) is unaffected.
+
+**Start on a project, or switch projects.** `nvim .` (or `nvim <folder>`)
+opens the Explorer next to the dashboard automatically. On the dashboard,
+`p` opens the Projects picker (folders you've opened before); from inside
+nvim the same picker is `<leader>fp`. A brand-new folder just needs
+`cd` + `nvim .` once.
+
+**tmux panes.** `prefix` `|` splits side by side (new pane on the right),
+`prefix` `-` splits top/bottom, both in the current directory. `prefix` `z`
+zooms the current pane to fill the window and un-zooms it again; `prefix`
+`x` closes the pane; `prefix` `d` detaches; `prefix` `:` opens tmux's command
+prompt (`split-window -h` always works, whatever your keyboard does with
+`|`). Remember the prefix is `Ctrl-a`, not tmux's default `Ctrl-b`.
+
+**The swap-file prompt.** If nvim says *Found a swap file ... already
+exists!* when you open a file, a previous nvim on that file never exited
+cleanly (closed tab, sleep, killed pane). Check the dates in the prompt:
+if the swap is far newer than the file's last save and you weren't
+mid-edit, press `D` to delete it. Press `R` first to recover and inspect it
+if you might have lost work, and `O` to open read-only. Avoid `E` unless
+you're sure no other nvim has the file open. The files live in
+`~/.local/state/nvim/swap/`.
+
+## How the pieces fit: flakes and home-manager
+
+**Flake.** `flake.nix` is the repo's entry point. Its *inputs* are the pinned
+dependencies (nixpkgs, nix-darwin, home-manager); its *outputs* are the two
+machine configurations (`rodrigos-macbook-pro`, `rodrigos-work-macbook`).
+`flake.lock` records the exact commit of every input, which is what makes
+both Macs build identical versions until you run `nix flake update`. Two
+consequences worth knowing: evaluation is pure (a flake can't read `$USER`
+or other environment at build time, which is why the work username has to
+be written into `flake.nix`, and why `bootstrap.sh` fills it in), and a
+flake only sees files git tracks (see "Rebuild can't find a file" above).
+
+**home-manager.** nix-darwin manages the machine (macOS defaults, Homebrew
+casks); home-manager manages everything under your home directory: shell,
+tmux, git, the nvim config, user CLI tools. Here it runs *as a nix-darwin
+module*, so one `switch` rebuilds both. `home/home.nix` imports
+`zsh.nix`, `tmux.nix`, `iterm2.nix` and `nvim/nvim.nix`. Two ways to
+configure something:
+
+- `programs.<tool>` modules (`programs.tmux`, `programs.zsh`, `programs.git`,
+  `programs.oh-my-posh`): typed options; home-manager generates the real
+  config file from them. Search the home-manager options list for
+  `programs.<tool>` first.
+- Plain files via `home.file` / `xdg.configFile`: used for the nvim config
+  and the iTerm2 profile. `lazy-lock.json` uses `mkOutOfStoreSymlink`
+  because lazy.nvim rewrites it and Nix store paths are read-only.
+
+Also: `home.packages` for CLI tools, `home.sessionVariables` for env vars.
+The generated files in `~` are symlinks into `/nix/store`, so editing them
+by hand does nothing durable: edit the `.nix` file, `switch`, restart
+whatever reads the config. Every switch is a generation, so
+`sudo darwin-rebuild --rollback` returns to the previous one. Leave
+`home.stateVersion` alone; it isn't a version to upgrade.
+
+## Troubleshooting
+
+| Symptom | Check |
+|---|---|
+| A language server isn't attaching | `:LspInfo` in the buffer, then `:Mason` to confirm it installed |
+| A plugin seems missing or stale | `:Lazy`; `:Lazy update` updates and rewrites `lazy-lock.json` |
+| nvim feels generally broken | `:checkhealth` |
+| Icons render as boxes | iTerm2 profile font must be the Meslo Nerd Font (`home/iterm2.nix`) |
+| `prefix` `|` (or any tmux binding) does nothing | Prefix is `Ctrl-a`; release it before pressing the next key; restart the tmux server if you changed config since it started; try `prefix` `:` then `split-window -h` |
+| "Found a swap file" prompt | See "The swap-file prompt" above |
+| `<leader>gh` shows a hunks menu, not file history | Expected, see "`<leader>gh` is two things" above |
+| Debugging/testing can't find ruby/node | Confirm they resolve on `PATH` in a terminal split; if not, add a PATH entry to `home/zsh.nix`, same pattern as `nvm` |
+| `bootstrap.sh` on the work Mac asks for a username | Expected: it fills the `CHANGE_ME` placeholders in `flake.nix` (default is `whoami`), then you commit the change |
+
 ## Why Claude Code isn't managed by Nix here
 
 It's installed manually on each machine instead of being declared in
@@ -217,6 +315,9 @@ log in with whichever account is right for that machine.
 - [x] Terminal: iTerm2 profile + Tmux config (`home/iterm2.nix`, `home/tmux.nix`)
 - [x] ~~Claude Code install~~ — intentionally left out of Nix management, see note below
 - [x] Neovim (LazyVim base): file navigation, git diff review, LSP (`home/nvim/`)
-- [x] Neovim IDE extras: outline, breadcrumbs, Harpoon2, illuminate, rename/refactor, Overseer tasks, debugging (DAP), testing (neotest), REST client, GitHub (Octo) - added, not yet verified by a real launch
-- [ ] Troubleshooting section
-- [ ] Push to GitHub + verify a second-machine clone actually works
+- [x] Neovim IDE extras: outline, breadcrumbs, Harpoon2, illuminate, rename/refactor, Overseer tasks, debugging (DAP), testing (neotest), REST client, GitHub (Octo) - plugins confirmed installed on a real launch; breakpoints, test runs and Octo not yet exercised
+- [x] Explorer opens automatically for `nvim <directory>`
+- [x] Troubleshooting section
+- [x] Browsable guide in the repo (`docs/guide.html`)
+- [x] Push to GitHub
+- [ ] Verify a second-machine clone actually works (`./bootstrap.sh rodrigos-work-macbook` on the work Mac)

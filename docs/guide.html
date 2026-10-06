@@ -142,10 +142,12 @@
       <li><a href="#nvim-basics">Neovim basics</a></li>
       <li><a href="#navigate">Navigate & find</a></li>
       <li><a href="#git">Git & code review</a></li>
+      <li><a href="#howtos">Everyday how-tos</a></li>
       <li><a href="#write">Write & refactor</a></li>
       <li><a href="#debug-test">Debug & test</a></li>
       <li><a href="#tasks-rest">Tasks & REST</a></li>
       <li><a href="#change-config">Changing the config</a></li>
+      <li><a href="#how-it-works">How it fits together</a></li>
       <li><a href="#manual-steps">Manual steps</a></li>
       <li><a href="#cheatsheet">Keymap cheat sheet</a></li>
       <li><a href="#troubleshooting">Troubleshooting</a></li>
@@ -161,7 +163,7 @@
         <div class="step"><span class="num"></span><div><strong>Open iTerm2.</strong><p>Launches into the "dotfiles" profile (Meslo Nerd Font, the "peru" oh-my-posh prompt).</p></div></div>
         <div class="step"><span class="num"></span><div><strong>Attach or start a tmux session.</strong><p><code>tmux</code> for a new one, <code>tmux a</code> to reattach — continuum auto-saves and restores your panes, so a reboot doesn't lose your layout.</p></div></div>
         <div class="step"><span class="num"></span><div><strong>Split panes for the tools you're running.</strong><p>One for <code>nvim</code>, one for a dev server or test watcher, one for <code>cc</code> (Claude Code) — <kbd>Ctrl</kbd><kbd>h/j/k/l</kbd> moves between them, and between nvim splits, without thinking about which one you're in.</p></div></div>
-        <div class="step"><span class="num"></span><div><strong>Open the project in nvim.</strong><p><code>nvim .</code> from the project root. Use the Explorer or the file picker to get around, LSP for navigation and diagnostics, Diffview/LazyGit for review.</p></div></div>
+        <div class="step"><span class="num"></span><div><strong>Open the project in nvim.</strong><p><code>nvim .</code> from the project root; the Explorer sidebar opens by itself next to the dashboard. Use it or the file picker to get around, LSP for navigation and diagnostics, Diffview/LazyGit for review.</p></div></div>
         <div class="step"><span class="num"></span><div><strong>Edit → check the diff → commit.</strong><p><kbd>&lt;leader&gt;gd</kbd> to see everything you've changed before you stage it, <kbd>&lt;leader&gt;gg</kbd> to commit from LazyGit without leaving nvim.</p></div></div>
       </div>
     </section>
@@ -176,16 +178,20 @@
         <table>
           <thead><tr><th>Keys</th><th>Does</th></tr></thead>
           <tbody>
-            <tr><td><kbd>prefix</kbd> <kbd>|</kbd></td><td>Split pane vertically, opens in the current pane's directory</td></tr>
-            <tr><td><kbd>prefix</kbd> <kbd>-</kbd></td><td>Split pane horizontally, same directory</td></tr>
+            <tr><td><kbd>prefix</kbd> <kbd>|</kbd></td><td>Split side by side (new pane on the right), opens in the current pane's directory</td></tr>
+            <tr><td><kbd>prefix</kbd> <kbd>-</kbd></td><td>Split top/bottom, same directory</td></tr>
             <tr><td><kbd>prefix</kbd> <kbd>c</kbd></td><td>New window, same directory</td></tr>
             <tr><td><kbd>Ctrl</kbd> <kbd>h/j/k/l</kbd></td><td>Move between panes — and seamlessly into/out of nvim splits, no prefix needed</td></tr>
             <tr><td><kbd>prefix</kbd> <kbd>H/J/K/L</kbd></td><td>Resize the current pane (repeatable — hold)</td></tr>
-            <tr><td><kbd>prefix</kbd> <kbd>r</kbd></td><td>Reload tmux config without restarting</td></tr>
+            <tr><td><kbd>prefix</kbd> <kbd>z</kbd></td><td>Zoom the current pane to fill the window; press again to restore</td></tr>
+            <tr><td><kbd>prefix</kbd> <kbd>x</kbd> / <kbd>d</kbd></td><td>Close the pane / detach from the session</td></tr>
+            <tr><td><kbd>prefix</kbd> <kbd>:</kbd></td><td>tmux command prompt — <code>split-window -h</code> works whatever your keyboard does with <kbd>|</kbd></td></tr>
+            <tr><td><kbd>prefix</kbd> <kbd>r</kbd></td><td>Re-source the tmux config (does not restart the server)</td></tr>
             <tr><td>mouse</td><td>Click to select a pane, drag borders to resize, scroll to scroll back — mouse mode is on</td></tr>
           </tbody>
         </table>
       </div>
+      <div class="callout warn"><strong>Changed a tmux setting?</strong> tmux reads its config once, when the server starts. After a <code>switch</code>, run <code>tmux kill-server</code> from outside tmux and open a fresh session — otherwise the running server keeps the old bindings.</div>
       <div class="callout"><strong>Your layout survives a reboot.</strong> <code>resurrect</code> + <code>continuum</code> auto-save your session every 15 minutes and restore it the next time tmux starts — <code>tmux a</code> after restarting your Mac should put you back where you left off, panes included.</div>
 
       <h3>iTerm2</h3>
@@ -306,6 +312,47 @@
       </div>
     </section>
 
+    <section id="howtos">
+      <h2>Everyday how-tos</h2>
+      <p class="lede">Small things that come up constantly once you're actually working — each answered once, here.</p>
+
+      <div class="card">
+        <span class="tag">Undo</span>
+        <h4>Revert changes in a file</h4>
+        <p>Press <kbd>&lt;leader&gt;gh</kbd> and wait — which-key shows the gitsigns <b>hunks</b> menu.</p>
+        <p class="try"><b>Try it:</b> <kbd>R</kbd> = Reset Buffer (discard every unstaged change in the file), <kbd>r</kbd> = Reset Hunk (just the chunk under the cursor). In the same menu: <kbd>s</kbd>/<kbd>S</kbd> stage a hunk/the buffer, <kbd>u</kbd> undo a stage, <kbd>p</kbd> preview a hunk inline, <kbd>b</kbd>/<kbd>B</kbd> blame line/buffer, <kbd>d</kbd> Diff This, <kbd>D</kbd> the "Diff This ~" variant against an earlier revision.</p>
+        <p>Reset restores the <em>index</em> version, so anything you already staged stays. For a true "back to the last commit" revert, open LazyGit (<kbd>&lt;leader&gt;gg</kbd>), select the file and discard its changes there.</p>
+      </div>
+      <div class="card">
+        <span class="tag">Diff</span>
+        <h4>Close a diff view</h4>
+        <p>"Diff This" opens a plain pair of splits, not the Diffview tab.</p>
+        <p class="try"><b>Try it:</b> close either half (<code>:q</code> or <kbd>Ctrl</kbd><kbd>w</kbd> <kbd>q</kbd>) and the other leaves diff mode by itself, or press <kbd>Ctrl</kbd><kbd>w</kbd> <kbd>o</kbd> in the window you want to keep to close everything else. The Diffview panel (<kbd>&lt;leader&gt;gd</kbd>) closes with <code>:DiffviewClose</code>.</p>
+      </div>
+      <div class="card">
+        <span class="tag">Keys</span>
+        <h4><kbd>&lt;leader&gt;gh</kbd> is two things</h4>
+        <p>This repo binds <kbd>&lt;leader&gt;gh</kbd> to Diffview's "current file history"; LazyVim core uses the same prefix for the hunks menu (<kbd>&lt;leader&gt;ghs</kbd>, <kbd>&lt;leader&gt;ghr</kbd>…). In practice which-key shows the hunks menu. If Diffview's file history ever seems unreachable, that's why — <kbd>&lt;leader&gt;gH</kbd> (repo history) is unaffected.</p>
+      </div>
+      <div class="card">
+        <span class="tag">Projects</span>
+        <h4>Start on a project, or switch projects</h4>
+        <p><code>nvim .</code> (or <code>nvim &lt;folder&gt;</code>) opens the Explorer next to the dashboard automatically.</p>
+        <p class="try"><b>Try it:</b> on the dashboard, <kbd>p</kbd> opens the Projects picker (folders you've opened before); from inside nvim it's <kbd>&lt;leader&gt;fp</kbd>. A brand-new folder just needs <code>cd</code> + <code>nvim .</code> once.</p>
+      </div>
+      <div class="card">
+        <span class="tag">tmux</span>
+        <h4>Panes</h4>
+        <p><kbd>prefix</kbd> <kbd>|</kbd> splits side by side, <kbd>prefix</kbd> <kbd>-</kbd> top/bottom, both in the current directory. <kbd>prefix</kbd> <kbd>z</kbd> zooms the current pane to fill the window (and restores it); <kbd>prefix</kbd> <kbd>x</kbd> closes it; <kbd>prefix</kbd> <kbd>d</kbd> detaches. The prefix is <kbd>Ctrl</kbd><kbd>a</kbd>, not tmux's default <kbd>Ctrl</kbd><kbd>b</kbd>.</p>
+      </div>
+      <div class="card">
+        <span class="tag">nvim</span>
+        <h4>The swap-file prompt</h4>
+        <p>"Found a swap file … already exists!" means a previous nvim on that file never exited cleanly (closed tab, sleep, killed pane). Compare the dates in the prompt.</p>
+        <p class="try"><b>Try it:</b> if the swap is far newer than the file's last save and you weren't mid-edit, press <kbd>D</kbd> to delete it. Press <kbd>R</kbd> first to recover and inspect it if you might have lost work, <kbd>O</kbd> to open read-only. Avoid <kbd>E</kbd> unless you're sure no other nvim has the file. Swap files live in <code>~/.local/state/nvim/swap/</code>.</p>
+      </div>
+    </section>
+
     <section id="write">
       <h2>Write & refactor</h2>
       <p class="lede">Formatting and linting already run automatically (Mason installs the right tool per language the first time you open a matching file) — these are the tools for actively reshaping code.</p>
@@ -375,6 +422,25 @@
       </div>
     </section>
 
+    <section id="how-it-works">
+      <h2>How it fits together</h2>
+      <p class="lede">The Nix side in plain terms — enough to know where to edit and why a rebuild behaves the way it does.</p>
+
+      <div class="card">
+        <span class="tag">Nix</span>
+        <h4>Flake</h4>
+        <p><code>flake.nix</code> is the repo's entry point. Its <b>inputs</b> are the pinned dependencies (nixpkgs, nix-darwin, home-manager); its <b>outputs</b> are the two machine configurations, <code>rodrigos-macbook-pro</code> and <code>rodrigos-work-macbook</code>. <code>flake.lock</code> records the exact commit of every input, which is why both Macs build identical versions until you run <code>nix flake update</code> — the same idea as <code>lazy-lock.json</code> for nvim plugins.</p>
+        <p>Two consequences: evaluation is <em>pure</em> (a flake can't read <code>$USER</code> or other environment at build time — hence the work username written into <code>flake.nix</code>, which <code>bootstrap.sh</code> fills in for you), and a flake only sees files <b>git tracks</b> — <code>git add</code> a new file before a rebuild.</p>
+      </div>
+      <div class="card">
+        <span class="tag">Nix</span>
+        <h4>home-manager</h4>
+        <p>nix-darwin manages the machine (macOS defaults, Homebrew casks); home-manager manages everything under your home directory — shell, tmux, git, the nvim config, user CLI tools. Here it runs <em>as a nix-darwin module</em>, so one <code>switch</code> rebuilds both. <code>home/home.nix</code> imports <code>zsh.nix</code>, <code>tmux.nix</code>, <code>iterm2.nix</code> and <code>nvim/nvim.nix</code>.</p>
+        <p class="try"><b>Two ways to configure a tool:</b> a <code>programs.&lt;tool&gt;</code> module (<code>programs.tmux</code>, <code>programs.zsh</code>, <code>programs.git</code>, <code>programs.oh-my-posh</code>) — typed options, home-manager generates the config file, so search its options list for <code>programs.&lt;tool&gt;</code> first; or plain files via <code>home.file</code> / <code>xdg.configFile</code> (used for nvim and the iTerm2 profile). <code>lazy-lock.json</code> uses <code>mkOutOfStoreSymlink</code> because lazy.nvim rewrites it and Nix store paths are read-only.</p>
+        <p>The generated files in <code>~</code> are symlinks into <code>/nix/store</code>, so editing them by hand does nothing durable: edit the <code>.nix</code> file, <code>switch</code>, restart whatever reads the config. Each switch is a generation — <code>sudo darwin-rebuild --rollback</code> returns to the previous one. Leave <code>home.stateVersion</code> alone; it isn't a version to upgrade.</p>
+      </div>
+    </section>
+
     <section id="manual-steps">
       <h2>Manual steps</h2>
       <p class="lede">A handful of things sit outside anything a <code>.nix</code> file can reach — one-time clicks or commands, not part of the regular workflow.</p>
@@ -428,7 +494,10 @@
           <summary>Git &amp; GitHub — <kbd>&lt;leader&gt;g*</kbd></summary>
           <div class="cheat-body">
             <div class="table-wrap"><table><tbody>
-              <tr><td><kbd>&lt;leader&gt;gd</kbd> / <kbd>gh</kbd> / <kbd>gH</kbd></td><td>Diffview open / file history / repo history</td></tr>
+              <tr><td><kbd>&lt;leader&gt;gd</kbd> / <kbd>gH</kbd></td><td>Diffview open / repo history</td></tr>
+              <tr><td><kbd>&lt;leader&gt;gh</kbd> then <kbd>R</kbd> / <kbd>r</kbd></td><td>Reset buffer / reset hunk (revert changes)</td></tr>
+              <tr><td><kbd>&lt;leader&gt;gh</kbd> then <kbd>s</kbd> / <kbd>S</kbd> / <kbd>u</kbd></td><td>Stage hunk / stage buffer / undo stage</td></tr>
+              <tr><td><kbd>&lt;leader&gt;gh</kbd> then <kbd>p</kbd> / <kbd>b</kbd> / <kbd>d</kbd></td><td>Preview hunk / blame line / Diff This</td></tr>
               <tr><td><kbd>&lt;leader&gt;gs</kbd></td><td>Quick git status + diff preview</td></tr>
               <tr><td><kbd>&lt;leader&gt;gg</kbd></td><td>LazyGit (floating)</td></tr>
               <tr><td><kbd>&lt;leader&gt;gb</kbd></td><td>Blame current line</td></tr>
@@ -472,7 +541,9 @@
               <tr><td><kbd>prefix</kbd> <kbd>|</kbd> / <kbd>-</kbd> / <kbd>c</kbd></td><td>Split vertical / horizontal / new window</td></tr>
               <tr><td><kbd>Ctrl</kbd> <kbd>h/j/k/l</kbd></td><td>Move between panes (and nvim splits)</td></tr>
               <tr><td><kbd>prefix</kbd> <kbd>H/J/K/L</kbd></td><td>Resize pane</td></tr>
-              <tr><td><kbd>prefix</kbd> <kbd>r</kbd></td><td>Reload config</td></tr>
+              <tr><td><kbd>prefix</kbd> <kbd>z</kbd> / <kbd>x</kbd> / <kbd>d</kbd></td><td>Zoom pane / close pane / detach</td></tr>
+              <tr><td><kbd>prefix</kbd> <kbd>:</kbd></td><td>tmux command prompt</td></tr>
+              <tr><td><kbd>prefix</kbd> <kbd>r</kbd></td><td>Re-source config (restart the server for a full reload)</td></tr>
             </tbody></table></div>
           </div>
         </details>
@@ -490,6 +561,10 @@
             <tr><td>A plugin seems missing or out of date</td><td><code>:Lazy</code> — shows install/update status for every plugin, <code>:Lazy update</code> updates and rewrites <code>lazy-lock.json</code></td></tr>
             <tr><td>Something feels generally broken</td><td><code>:checkhealth</code> — nvim's own built-in diagnostic, flags missing tools/config issues</td></tr>
             <tr><td>Icons/glyphs render as boxes</td><td>Confirm iTerm2's profile font is actually "MesloLGSNerdFontMono" (Font Book → exact family name) — see <code>home/iterm2.nix</code></td></tr>
+            <tr><td><kbd>prefix</kbd> <kbd>|</kbd> (or any tmux binding) does nothing</td><td>Prefix is <kbd>Ctrl</kbd><kbd>a</kbd>; release it before the next key; <code>tmux kill-server</code> and reopen if you changed the config since the server started; fallback: <kbd>prefix</kbd> <kbd>:</kbd> then <code>split-window -h</code></td></tr>
+            <tr><td>"Found a swap file" prompt when opening a file</td><td>See <a href="#howtos">Everyday how-tos</a> — usually press <kbd>D</kbd> to delete a stale one</td></tr>
+            <tr><td><kbd>&lt;leader&gt;gh</kbd> shows a hunks menu, not file history</td><td>Expected — see <a href="#howtos">Everyday how-tos</a>; <kbd>&lt;leader&gt;gH</kbd> (repo history) is unaffected</td></tr>
+            <tr><td><code>switch</code> says it can't find a file you just created</td><td><code>git add</code> it — a flake only sees files git tracks</td></tr>
             <tr><td>Debugging or testing can't find a runtime</td><td>Open a terminal split (<kbd>Ctrl</kbd><kbd>/</kbd>) and confirm <code>ruby</code>/<code>node</code>/<code>gem</code> resolve on <code>PATH</code> — if not, that's a <code>home/zsh.nix</code> PATH entry to add, same pattern as <code>nvm</code>'s</td></tr>
           </tbody>
         </table>

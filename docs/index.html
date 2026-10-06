@@ -40,7 +40,7 @@
 <body>
 <main>
   <h1>Dev environment — status</h1>
-  <p class="sub">Repo: <code>~/Projetos/dotfiles</code> · Last updated: 2026-09-29 · <a href="guide.html">Usage guide &rarr;</a></p>
+  <p class="sub">Repo: <code>~/Projetos/dotfiles</code> · Last updated: 2026-10-06 · <a href="guide.html">Usage guide &rarr;</a></p>
 
   <div class="phase">
     <div class="badge done">✓</div>
@@ -52,7 +52,7 @@
   <div class="phase">
     <div class="badge pending">~</div>
     <div><h2>3. Homebrew - hands-off on both machines</h2>
-    <p><strong>Personal:</strong> existing Homebrew install left exactly as-is; Nix only adds the declared casks (iTerm2, Meslo Nerd Font) on top (<code>darwin/personal-homebrew.nix</code>) - switched from nix-homebrew ownership after its auto-migration couldn't cleanly adopt an existing <code>Library/Taps</code>. <strong>Work:</strong> same hands-off model, for the company-managed build - Nix only adds declared casks/brews, never removes anything (<code>darwin/work-homebrew.nix</code>); not yet activated there, and <code>flake.nix</code> still needs the real work username filled in.</p></div>
+    <p><strong>Personal:</strong> existing Homebrew install left exactly as-is; Nix only adds the declared casks (iTerm2, Meslo Nerd Font) on top (<code>darwin/personal-homebrew.nix</code>) - switched from nix-homebrew ownership after its auto-migration couldn't cleanly adopt an existing <code>Library/Taps</code>. <strong>Work:</strong> same hands-off model, for the company-managed build - Nix only adds declared casks/brews, never removes anything (<code>darwin/work-homebrew.nix</code>); not yet activated there. <code>bootstrap.sh</code> asks for the work username on first run and fills the <code>CHANGE_ME</code> placeholders in <code>flake.nix</code> for you (review and commit that change afterwards).</p></div>
     <div class="status-label pending">Personal: activated · Work: pending</div>
   </div>
 
@@ -80,29 +80,35 @@
   <div class="phase">
     <div class="badge done">7</div>
     <div><h2>Neovim (LazyVim base) — full terminal IDE</h2>
-    <p><code>home/nvim/</code>: LazyVim starter, symlinked into <code>~/.config/nvim</code>. Telescope/neo-tree/gitsigns/trouble/Mason come from LazyVim's core by default; added diffview.nvim + lazygit.nvim (<code>&lt;leader&gt;gd/gh/gg</code>) and vim-tmux-navigator ourselves. <strong>First real launch confirmed</strong> all 35 plugins installed and up to date; <code>home/nvim/lazy-lock.json</code> now pins their exact versions (via <code>mkOutOfStoreSymlink</code>, so <code>:Lazy update</code> writes straight into the tracked file).</p></div>
+    <p><code>home/nvim/</code>: LazyVim starter, symlinked into <code>~/.config/nvim</code>. snacks.nvim (Explorer + Picker), gitsigns, trouble and Mason come from LazyVim's core by default; added diffview.nvim + lazygit.nvim (<code>&lt;leader&gt;gd/gh/gg</code>) and vim-tmux-navigator ourselves. <strong>First real launch confirmed</strong> all 35 plugins installed and up to date; <code>home/nvim/lazy-lock.json</code> now pins their exact versions (via <code>mkOutOfStoreSymlink</code>, so <code>:Lazy update</code> writes straight into the tracked file). Since then: launching <code>nvim &lt;folder&gt;</code> opens the Explorer automatically beside the dashboard (added 2026-10-01; not yet confirmed by a real launch).</p></div>
     <div class="status-label done">Activated</div>
   </div>
 
   <div class="phase">
-    <div class="badge todo">8</div>
+    <div class="badge done">8</div>
     <div><h2>Documentation</h2>
-    <p>README.md and docs/GUIDE.md started; this page is the tracker. Updated incrementally as phases land.</p></div>
-    <div class="status-label pending">In progress</div>
+    <p><code>README.md</code> (overview), <code>docs/GUIDE.md</code> (usage guide, Markdown), <a href="guide.html"><code>docs/guide.html</code></a> (the same guide as a browsable page, with day-to-day how-tos and a "how it works" section on flakes and home-manager), and this page as the tracker. Both pages are also published as hosted artifacts. Kept up to date as phases land.</p></div>
+    <div class="status-label done">Up to date</div>
   </div>
 
   <div class="phase">
-    <div class="badge todo">9–10</div>
+    <div class="badge pending">9–10</div>
     <div><h2>Portability check + workflow doc</h2>
-    <p>Not started — will simulate a second machine and finalize bootstrap.sh once phases 3–7 are done.</p></div>
-    <div class="status-label todo">To do</div>
+    <p><code>bootstrap.sh</code> exists: it checks dependencies, installs Nix if needed, asks for the work username when the placeholder is still there, and activates the right machine config. It has not yet been run end to end on a second machine, which is what this phase still needs.</p></div>
+    <div class="status-label pending">Script ready, untested</div>
   </div>
 
   <div class="phase">
     <div class="badge pending">11</div>
     <div><h2>Neovim as a full IDE: extras</h2>
-    <p>Outline/breadcrumbs, Harpoon2, illuminate, rename/refactor, Overseer tasks, debugging (DAP), testing (neotest), REST client, GitHub (Octo) — all enabled in <code>home/nvim/lua/config/lazy.lua</code>. File tree + changed-files diff were already covered by Phase 7. Not yet verified by a real launch, and Octo needs a one-time <code>gh auth login</code>.</p></div>
-    <div class="status-label pending">Added, unverified</div>
+    <p>Outline/breadcrumbs, Harpoon2, illuminate, rename/refactor, Overseer tasks, debugging (DAP), testing (neotest), REST client, GitHub (Octo) — all enabled in <code>home/nvim/lua/config/lazy.lua</code>. File tree + changed-files diff were already covered by Phase 7. The plugins were confirmed installed on 2026-09-30; what's still unchecked is whether each one works in daily use (setting a breakpoint, running a test, Octo, which needs a one-time <code>gh auth login</code>).</p></div>
+    <div class="status-label pending">Installed, checks pending</div>
+  </div>
+
+  <div class="phase">
+    <div class="badge done">&#9998;</div>
+    <div><h2>Recent changes</h2>
+    <p><strong>2026-10-02</strong> &mdash; <code>bootstrap.sh</code> asks for the work username instead of stopping on <code>CHANGE_ME</code>; <code>.idea/</code> git-ignored. <strong>2026-10-01</strong> &mdash; Explorer auto-opens when nvim starts on a folder. <strong>2026-09-30</strong> &mdash; usage guide added as <code>docs/guide.html</code>; extras plugins confirmed installed. <strong>2026-09-29</strong> &mdash; web/Ruby LSP extras and full-IDE extras enabled; plugin versions pinned.</p></div>
   </div>
 
   <footer>Generated alongside the config in <code>~/Projetos/dotfiles</code>. Edit this file directly, or ask Claude to regenerate it as phases progress.</footer>

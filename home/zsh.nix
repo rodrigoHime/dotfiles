@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, dotfilesDir, ... }:
 
 {
   # ── Shell: zsh + oh-my-zsh (plugins/framework) + oh-my-posh (prompt) ──
@@ -26,9 +26,11 @@
       gd = "git diff";
       vim = "nvim";
       vi = "nvim";
-      # $DOTFILES_TARGET is set per-machine by flake.nix (mkHomeManager),
-      # so this one alias works correctly on either machine.
-      switch = "sudo darwin-rebuild switch --flake \"$HOME/Projetos/dotfiles#$DOTFILES_TARGET\"";
+      # $DOTFILES_TARGET and the checkout folder (dotfilesDir, relative to
+      # $HOME) are both set per-machine by flake.nix (mkHomeManager), so
+      # this one alias works correctly on either machine even though the
+      # repo lives at a different path on each.
+      switch = "sudo darwin-rebuild switch --flake \"$HOME/${dotfilesDir}#$DOTFILES_TARGET\"";
       # Ported from the pre-existing ~/.zshrc (kept as ~/.zshrc.backup
       # after the first real activation) - your call, not ours.
       cc = "claude --dangerously-skip-permissions";

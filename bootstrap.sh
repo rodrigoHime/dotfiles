@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # One-shot bootstrap for a brand-new Mac. Run from an empty checkout of
-# this repo at ~/Projetos/dotfiles (or wherever you cloned it).
+# this repo at the dotfilesDir set for the target in flake.nix
+# (~/Projetos/dotfiles on the personal Mac, ~/Projects/dotfiles on the work Mac).
 #
 # Usage: ./bootstrap.sh <flake-target>
 #   e.g. ./bootstrap.sh rodrigos-macbook-pro     (personal Mac)
@@ -55,6 +56,25 @@ if [ "$TARGET" = "rodrigos-work-macbook" ] && grep -q '"CHANGE_ME"' flake.nix; t
   echo "flake.nix updated: username = \"${WORK_USERNAME}\" (both occurrences)."
   echo "This script won't commit that change for you - review it (git diff" >&2
   echo "flake.nix) and commit once activation below succeeds." >&2
+fi
+
+# The repo's checkout folder is baked into flake.nix per machine
+# (dotfilesDir, relative to $HOME): the `switch` alias and the
+# lazy-lock.json symlink both depend on it. Warn if this clone lives
+# somewhere else, so a mismatch shows up now instead of as a confusing
+# "No such file or directory" later.
+EXPECTED_REL="$(grep "target = \"${TARGET}\"" flake.nix | sed -n 's/.*dotfilesDir = "\([^"]*\)".*/\1/p' | head -n 1)"
+if [ -n "$EXPECTED_REL" ]; then
+  HERE="$(pwd -P)"
+  EXPECTED="$(cd "$HOME/$EXPECTED_REL" 2>/dev/null && pwd -P || true)"
+  if [ "$HERE" != "$EXPECTED" ]; then
+    echo "Warning: flake.nix expects this repo at ~/${EXPECTED_REL} for ${TARGET}," >&2
+    echo "but it is at ${HERE}. The 'switch' alias and the nvim lazy-lock.json" >&2
+    echo "link would point at the wrong place. Either move/clone the repo to" >&2
+    echo "~/${EXPECTED_REL}, or change dotfilesDir for this target in flake.nix." >&2
+    read -r -p "Continue anyway? [y/N]: " CONT
+    [ "$CONT" = "y" ] || [ "$CONT" = "Y" ] || exit 1
+  fi
 fi
 
 echo "==> 2/6 Xcode Command Line Tools"

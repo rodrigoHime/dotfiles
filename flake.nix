@@ -20,7 +20,14 @@
       # should rebuild against (read by the `switch` shell alias in
       # home/zsh.nix, so that alias doesn't have to hardcode a name
       # that's wrong on the other machine).
-      mkHomeManager = { username, target }: [
+      #
+      # dotfilesDir is where this repo is checked out, relative to the
+      # user's home folder. It differs between the machines (personal:
+      # ~/Projetos/dotfiles, work: ~/Projects/dotfiles), so it is a
+      # per-machine setting passed in below, never hardcoded in the
+      # modules. home/zsh.nix (the `switch` alias) and home/nvim/nvim.nix
+      # (the lazy-lock.json symlink) both read it.
+      mkHomeManager = { username, target, dotfilesDir }: [
         home-manager.darwinModules.home-manager
         {
           home-manager.useGlobalPkgs = true;
@@ -31,6 +38,7 @@
           # there, move any conflicting existing file to "<name>.backup"
           # once, then home-manager takes over that path going forward.
           home-manager.backupFileExtension = "backup";
+          home-manager.extraSpecialArgs = { inherit dotfilesDir; };
           home-manager.users.${username} = {
             imports = [ ./home/home.nix ];
             home.sessionVariables.DOTFILES_TARGET = target;
@@ -50,7 +58,7 @@
         modules = [
           ./darwin/common.nix
           ./darwin/personal-homebrew.nix
-        ] ++ mkHomeManager { username = "rodrigohime"; target = "rodrigos-macbook-pro"; };
+        ] ++ mkHomeManager { username = "rodrigohime"; target = "rodrigos-macbook-pro"; dotfilesDir = "Projetos/dotfiles"; };
       };
 
       # Work MacBook. Homebrew there is the company-managed build -
@@ -72,7 +80,7 @@
         modules = [
           ./darwin/common.nix
           ./darwin/work-homebrew.nix
-        ] ++ mkHomeManager { username = "CHANGE_ME"; target = "rodrigos-work-macbook"; };
+        ] ++ mkHomeManager { username = "CHANGE_ME"; target = "rodrigos-work-macbook"; dotfilesDir = "Projects/dotfiles"; };
       };
     };
 }

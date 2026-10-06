@@ -170,7 +170,8 @@ Once activated once, the `switch` shell alias (from `home/zsh.nix`)
 picks the right target automatically on whichever machine you're on:
 ```
 # edit a .nix file
-switch                       # same as: sudo darwin-rebuild switch --flake "$HOME/Projetos/dotfiles#$DOTFILES_TARGET"
+switch                       # same as: sudo darwin-rebuild switch --flake "$HOME/<repo folder>#$DOTFILES_TARGET"
+                             # (repo folder: ~/Projetos/dotfiles personal, ~/Projects/dotfiles work - set by dotfilesDir in flake.nix)
 git add -A && git commit -m "..."
 git push
 ```

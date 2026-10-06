@@ -15,8 +15,8 @@ everything is described in `.nix` files in this repo, and one command
 
 | I want to...                          | Command |
 |----------------------------------------|---------|
-| Apply changes after editing a `.nix` file | `switch` (a shell alias for `sudo darwin-rebuild switch --flake "$HOME/Projetos/dotfiles#$DOTFILES_TARGET"` - `$DOTFILES_TARGET` is set correctly per-machine automatically; darwin-rebuild needs sudo to apply system-level changes) |
-| See what would change, without applying | `darwin-rebuild build --flake "$HOME/Projetos/dotfiles#$DOTFILES_TARGET"` then diff `result` |
+| Apply changes after editing a `.nix` file | `switch` (a shell alias for `sudo darwin-rebuild switch --flake "$HOME/<repo folder>#$DOTFILES_TARGET"` - the repo folder (`~/Projetos/dotfiles` on the personal Mac, `~/Projects/dotfiles` on the work Mac) and `$DOTFILES_TARGET` are both set correctly per-machine automatically; darwin-rebuild needs sudo to apply system-level changes) |
+| See what would change, without applying | `darwin-rebuild build --flake "$HOME/<repo folder>#$DOTFILES_TARGET"` then diff `result` |
 | Update package versions (nixpkgs, home-manager, etc.) | `nix flake update` (inside the repo), then `switch` |
 | Share changes with another machine | `git add -A && git commit -m "..." && git push`, then on the other machine `git pull && switch` |
 | Add a GUI app (personal machine) | Add its cask name to `darwin/personal-homebrew.nix` under `homebrew.casks`, then `switch` |
@@ -160,8 +160,10 @@ the out-of-store symlink, `:Lazy update` writes directly into the
 tracked file: `git diff` shows exactly which plugins moved, `git
 checkout home/nvim/lazy-lock.json` reverts it, `git add -A && git
 commit` locks in a deliberate upgrade - same workflow as any other file
-here. (This does assume the repo lives at `~/Projetos/dotfiles` - true
-on both machines per this project's own convention.)
+here. (The repo's folder differs per machine - `~/Projetos/dotfiles` on the
+personal Mac, `~/Projects/dotfiles` on the work Mac - so it is the
+`dotfilesDir` setting in `flake.nix`, passed to both this file and the
+`switch` alias. Clone somewhere else and you have to change it there.)
 
 ## Neovim as an IDE: navigation, debugging, testing, tasks, GitHub
 

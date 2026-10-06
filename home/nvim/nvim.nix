@@ -1,4 +1,4 @@
-{ pkgs, config, ... }:
+{ pkgs, config, dotfilesDir, ... }:
 
 {
   home.packages = with pkgs; [
@@ -23,11 +23,11 @@
   # rewrites this file whenever you run `:Lazy update`, and the Nix
   # store is read-only, so a normal symlink would make that fail with
   # a permission error. mkOutOfStoreSymlink instead points straight at
-  # the repo file on disk (assumes the repo lives at
-  # ~/Projetos/dotfiles, per this project's own convention), so
+  # the repo file on disk (dotfilesDir, set per machine in flake.nix,
+  # since the checkout path differs between the machines), so
   # `:Lazy update` writes directly into the tracked file - `git diff`
   # shows exactly what changed, `git checkout` reverts it, same as any
   # other file here.
   xdg.configFile."nvim/lazy-lock.json".source =
-    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/Projetos/dotfiles/home/nvim/lazy-lock.json";
+    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/${dotfilesDir}/home/nvim/lazy-lock.json";
 }

@@ -13,13 +13,13 @@ Rodrigo Hime's reproducible macOS dev environment, rebuilt on any Mac with `git 
 - Neovim on a LazyVim base, set up as a terminal IDE
 - Claude Code is installed manually per machine, on purpose (not Nix-managed)
 
-Repo path convention: `~/Projetos/dotfiles` on both machines. Remote: `github.com/rodrigoHime/dotfiles`.
+Repo path differs per machine: `~/Projetos/dotfiles` (personal) and `~/Projects/dotfiles` (work). It is the per-machine `dotfilesDir` argument of `mkHomeManager` in `flake.nix`, read by the `switch` alias (`home/zsh.nix`) and the `lazy-lock.json` symlink (`home/nvim/nvim.nix`). Never hardcode the path elsewhere. Remote: `github.com/rodrigoHime/dotfiles`.
 Two machines, one flake:
 
 | Flake target | Machine | Notes |
 |---|---|---|
 | `rodrigos-macbook-pro` | Personal Mac | Fully activated. Username `rodrigohime`. |
-| `rodrigos-work-macbook` | Work Mac | Never activated. `flake.nix` still has two `"CHANGE_ME"` username placeholders; `bootstrap.sh rodrigos-work-macbook` asks for the username and fills them. |
+| `rodrigos-work-macbook` | Work Mac | Username `rodrigosilva`, repo at `~/Projects/dotfiles`. In the committed `flake.nix` the username is still two `"CHANGE_ME"` placeholders; `bootstrap.sh rodrigos-work-macbook` asks for it and fills them locally. First `switch` there hit the wrong-path bug fixed on 2026-10-06. |
 
 The target names are labels, not hostnames. The `switch` zsh alias reads `$DOTFILES_TARGET`, set per machine in `flake.nix`.
 
@@ -43,7 +43,7 @@ bootstrap.sh                 one-shot setup, requires a target argument
 README.md                    quick start
 ```
 
-Daily loop: edit, then `switch` (alias for `sudo darwin-rebuild switch --flake "$HOME/Projetos/dotfiles#$DOTFILES_TARGET"`), commit, push.
+Daily loop: edit, then `switch` (alias for `sudo darwin-rebuild switch --flake "$HOME/<dotfilesDir>#$DOTFILES_TARGET"`), commit, push.
 
 ## Decisions already made (do not reopen without asking)
 
